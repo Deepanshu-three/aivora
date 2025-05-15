@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model Product {
+  id            String        @id @default(cuid())
+  title         String
+  description   String
+  price         Float
+  imageUrl      String
+  isNewRelease  Boolean       @default(false)
+  isBestSeller  Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  reviews       Review[]
+  orderItems    OrderItem[]
+}
+
+model Review {
+  id        String    @id @default(cuid())
+  content   String
+  rating    Int       // 1 to 5
+  userId    String    // Clerk user ID
+  product   Product   @relation(fields: [productId], references: [id])
+  productId String
+  createdAt DateTime  @default(now())
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String      // Clerk user ID
+  items     OrderItem[]
+  total     Float
+  createdAt DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String    @id @default(cuid())
+  product   Product   @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float      // Price at the time of order
+  order     Order      @relation(fields: [orderId], references: [id])
+  orderId   String
+}
