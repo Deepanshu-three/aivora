@@ -34,7 +34,7 @@ function SidebarWithFilters() {
     <div className="flex">
       {/* Desktop Sidebar Filters */}
       <div className="hidden md:block min-w-[400px] max-w-[400px] min-h-screen overflow-hidden bg-primary/5 dark:bg-secondary/30 dark:text-foreground text-muted-foreground border-r-2 border-separate ">
-        <div className="mt-20 p-10">
+        <div className="p-10">
           <h1 className="text-2xl font-bold text-center mb-4">Filters</h1>
           <div className="space-y-2">
             <p>🔘 Filter A</p>
@@ -68,7 +68,7 @@ function SidebarWithFilters() {
         </div>
 
         {/* Page Content */}
-        <div className="p-4 pt-20 md:p-28">
+        <div className="p-4 ">
           <ProductsList />
         </div>
       </div>
