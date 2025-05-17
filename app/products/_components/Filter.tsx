@@ -1,350 +1,79 @@
 "use client";
-
-import { useState } from "react";
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  ChevronDownIcon,
-  FunnelIcon,
-  MinusIcon,
-  PlusIcon,
-  Squares2X2Icon,
-} from "@heroicons/react/20/solid";
+  CoinsIcon,
+  HomeIcon,
+  Layers2Icon,
+  MenuIcon,
+  ShieldCheckIcon,
+  FilterIcon,
+} from "lucide-react";
+import React, { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ProductsList from "./Product";
 
-const sortOptions = [
-  { name: "Most Popular", href: "#", current: true },
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
-];
-const subCategories = [
-  { name: "Totes", href: "#" },
-  { name: "Backpacks", href: "#" },
-  { name: "Travel Bags", href: "#" },
-  { name: "Hip Bags", href: "#" },
-  { name: "Laptop Sleeves", href: "#" },
-];
-const filters = [
-  {
-    id: "color",
-    name: "Color",
-    options: [
-      { value: "white", label: "White", checked: false },
-      { value: "beige", label: "Beige", checked: false },
-      { value: "blue", label: "Blue", checked: true },
-      { value: "brown", label: "Brown", checked: false },
-      { value: "green", label: "Green", checked: false },
-      { value: "purple", label: "Purple", checked: false },
-    ],
-  },
-  {
-    id: "category",
-    name: "Category",
-    options: [
-      { value: "new-arrivals", label: "New Arrivals", checked: false },
-      { value: "sale", label: "Sale", checked: false },
-      { value: "travel", label: "Travel", checked: true },
-      { value: "organization", label: "Organization", checked: false },
-      { value: "accessories", label: "Accessories", checked: false },
-    ],
-  },
-  {
-    id: "size",
-    name: "Size",
-    options: [
-      { value: "2l", label: "2L", checked: false },
-      { value: "6l", label: "6L", checked: false },
-      { value: "12l", label: "12L", checked: false },
-      { value: "18l", label: "18L", checked: false },
-      { value: "20l", label: "20L", checked: false },
-      { value: "40l", label: "40L", checked: true },
-    ],
-  },
+const routes = [
+  { href: "/", label: "Home", icon: HomeIcon },
+  { href: "workflows", label: "Workflows", icon: Layers2Icon },
+  { href: "credentials", label: "Credentials", icon: ShieldCheckIcon },
+  { href: "billing", label: "Billing", icon: CoinsIcon },
 ];
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
+function SidebarWithFilters() {
+  const pathname = usePathname();
+  const activeRoute =
+    routes.find(
+      (route) =>
+        pathname === `/${route.href}` || pathname.startsWith(`/${route.href}`)
+    ) || routes[0];
 
-export default function Filters() {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [isFilterOpen, setFilterOpen] = useState(false);
 
   return (
-    <div className="bg-white sticky top-28 self-start h-fit">
-      <div>
-        {/* Mobile filter dialog */}
-        <Dialog
-          open={mobileFiltersOpen}
-          onClose={setMobileFiltersOpen}
-          className="relative z-40 lg:hidden"
-        >
-          <DialogBackdrop
-            transition
-            className="fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear data-closed:opacity-0"
-          />
-
-          <div className="fixed inset-0 z-40 flex">
-            <DialogPanel
-              transition
-              className="relative ml-auto flex size-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-closed:translate-x-full"
-            >
-              <div className="flex items-center justify-between px-4">
-                <h2 className="text-lg font-medium text-gray-900">Filters</h2>
-                <button
-                  type="button"
-                  onClick={() => setMobileFiltersOpen(false)}
-                  className="-mr-2 flex size-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                >
-                  <span className="sr-only">Close menu</span>
-                  <XMarkIcon aria-hidden="true" className="size-6" />
-                </button>
-              </div>
-
-              {/* Filters */}
-              <form className="mt-4 border-t border-gray-200">
-                <h3 className="sr-only">Categories</h3>
-                <ul role="list" className="px-2 py-3 font-medium text-gray-900">
-                  {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href} className="block px-2 py-3">
-                        {category.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-
-                {filters.map((section) => (
-                  <Disclosure
-                    key={section.id}
-                    as="div"
-                    className="border-t border-gray-200 px-4 py-6"
-                  >
-                    <h3 className="-mx-2 -my-3 flow-root">
-                      <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">
-                          {section.name}
-                        </span>
-                        <span className="ml-6 flex items-center">
-                          <PlusIcon
-                            aria-hidden="true"
-                            className="size-5 group-data-open:hidden"
-                          />
-                          <MinusIcon
-                            aria-hidden="true"
-                            className="size-5 group-not-data-open:hidden"
-                          />
-                        </span>
-                      </DisclosureButton>
-                    </h3>
-                    <DisclosurePanel className="pt-6">
-                      <div className="space-y-6">
-                        {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex gap-3">
-                            <div className="flex h-5 shrink-0 items-center">
-                              <div className="group grid size-4 grid-cols-1">
-                                <input
-                                  defaultValue={option.value}
-                                  id={`filter-mobile-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  type="checkbox"
-                                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                />
-                                <svg
-                                  fill="none"
-                                  viewBox="0 0 14 14"
-                                  className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                                >
-                                  <path
-                                    d="M3 8L6 11L11 3.5"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="opacity-0 group-has-checked:opacity-100"
-                                  />
-                                  <path
-                                    d="M3 7H11"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="opacity-0 group-has-indeterminate:opacity-100"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                            <label
-                              htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                              className="min-w-0 flex-1 text-gray-500"
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                ))}
-              </form>
-            </DialogPanel>
+    <div className="flex">
+      {/* Desktop Sidebar Filters */}
+      <div className="hidden md:block min-w-[400px] max-w-[400px] min-h-screen overflow-hidden bg-primary/5 dark:bg-secondary/30 dark:text-foreground text-muted-foreground border-r-2 border-separate ">
+        <div className="mt-20 p-10">
+          <h1 className="text-2xl font-bold text-center mb-4">Filters</h1>
+          <div className="space-y-2">
+            <p>🔘 Filter A</p>
+            <p>🔘 Filter B</p>
+            <p>🔘 Filter C</p>
           </div>
-        </Dialog>
+        </div>
+      </div>
 
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Products
-            </h1>
-
-            <div className="flex items-center">
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                    Sort
-                    <ChevronDownIcon
-                      aria-hidden="true"
-                      className="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500"
-                    />
-                  </MenuButton>
-                </div>
-
-                <MenuItems
-                  transition
-                  className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                >
-                  <div className="py-1">
-                    {sortOptions.map((option) => (
-                      <MenuItem key={option.name}>
-                        <a
-                          href={option.href}
-                          className={classNames(
-                            option.current
-                              ? "font-medium text-gray-900"
-                              : "text-gray-500",
-                            "block px-4 py-2 text-sm data-focus:bg-gray-100 data-focus:outline-hidden"
-                          )}
-                        >
-                          {option.name}
-                        </a>
-                      </MenuItem>
-                    ))}
-                  </div>
-                </MenuItems>
-              </Menu>
-
-              <button
-                type="button"
-                className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
-              >
-                <span className="sr-only">View grid</span>
-                <Squares2X2Icon aria-hidden="true" className="size-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileFiltersOpen(true)}
-                className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
-              >
-                <span className="sr-only">Filters</span>
-                <FunnelIcon aria-hidden="true" className="size-5" />
-              </button>
-            </div>
-          </div>
-
-          <section aria-labelledby="products-heading" className="pt-6 pb-24">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-              {/* Filters (hidden on mobile) */}
-              <form className="hidden lg:block">
-                <h3 className="sr-only">Categories</h3>
-                <ul
-                  role="list"
-                  className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900"
-                >
-                  {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
-                    </li>
-                  ))}
-                </ul>
-
-                {filters.map((section) => (
-                  <Disclosure
-                    key={section.id}
-                    as="div"
-                    className="border-b border-gray-200 py-6"
-                  >
-                    {({ open }) => (
-                      <>
-                        <h3 className="-my-3 flow-root">
-                          <DisclosureButton className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                            <span className="font-medium text-gray-900">
-                              {section.name}
-                            </span>
-                            <span className="ml-6 flex items-center">
-                              <PlusIcon
-                                className={classNames(
-                                  open ? "hidden" : "block",
-                                  "h-5 w-5"
-                                )}
-                              />
-                              <MinusIcon
-                                className={classNames(
-                                  open ? "block" : "hidden",
-                                  "h-5 w-5"
-                                )}
-                              />
-                            </span>
-                          </DisclosureButton>
-                        </h3>
-                        <DisclosurePanel className="pt-6">
-                          <div className="space-y-4">
-                            {section.options.map((option, optionIdx) => (
-                              <div
-                                key={option.value}
-                                className="flex items-center"
-                              >
-                                <input
-                                  id={`filter-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  defaultValue={option.value}
-                                  type="checkbox"
-                                  defaultChecked={option.checked}
-                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <label
-                                  htmlFor={`filter-${section.id}-${optionIdx}`}
-                                  className="ml-3 text-sm text-gray-600"
-                                >
-                                  {option.label}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </DisclosurePanel>
-                      </>
-                    )}
-                  </Disclosure>
-                ))}
-              </form>
-
-              {/* Product grid */}
-              <div className="lg:col-span-3">
-                <ProductsList />
+      {/* Main content */}
+      <div className="flex-1">
+        {/* Mobile Filter Trigger */}
+        <div className="md:hidden sticky top-16 z-30 bg-background border-b p-2 flex justify-between items-center">
+          <span className="text-lg font-bold">Products</span>
+          <Sheet open={isFilterOpen} onOpenChange={setFilterOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                <FilterIcon className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] p-4 space-y-4">
+              <h2 className="text-xl font-bold">Filters</h2>
+              <div className="space-y-2">
+                <p>🔘 Filter A</p>
+                <p>🔘 Filter B</p>
+                <p>🔘 Filter C</p>
               </div>
-            </div>
-          </section>
-        </main>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Page Content */}
+        <div className="p-4 pt-20 md:p-28">
+          <ProductsList />
+        </div>
       </div>
     </div>
   );
 }
+
+export default SidebarWithFilters;

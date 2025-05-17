@@ -1,6 +1,8 @@
 "use client"
 import { useState } from "react"
 import ProductCard from "@/components/ProductCard"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 
 const products = [
   {
@@ -39,7 +41,6 @@ const products = [
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
     rating: 4
   },
-  // Add more products here...
   {
     id: 5,
     name: 'Notebook',
@@ -93,99 +94,23 @@ const products = [
     imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-02.jpg',
     imageAlt: 'Fast wireless charger',
     rating: 4
-  },
-  {
-    id: 8,
-    name: 'Fountain Pen',
-    href: '#',
-    price: '$60',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-04.jpg',
-    imageAlt: 'Classic fountain pen',
-    rating: 5
-  },
-  {
-    id: 9,
-    name: 'Desk Organizer',
-    href: '#',
-    price: '$40',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-03.jpg',
-    imageAlt: 'Wooden desk organizer',
-    rating: 4
-  },
-  {
-    id: 10,
-    name: 'Wireless Charger',
-    href: '#',
-    price: '$70',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-02.jpg',
-    imageAlt: 'Fast wireless charger',
-    rating: 4
-  },
-  {
-    id: 8,
-    name: 'Fountain Pen',
-    href: '#',
-    price: '$60',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-04.jpg',
-    imageAlt: 'Classic fountain pen',
-    rating: 5
-  },
-  {
-    id: 9,
-    name: 'Desk Organizer',
-    href: '#',
-    price: '$40',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-03.jpg',
-    imageAlt: 'Wooden desk organizer',
-    rating: 4
-  },
-  {
-    id: 10,
-    name: 'Wireless Charger',
-    href: '#',
-    price: '$70',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-02.jpg',
-    imageAlt: 'Fast wireless charger',
-    rating: 4
-  },
-  {
-    id: 8,
-    name: 'Fountain Pen',
-    href: '#',
-    price: '$60',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-04.jpg',
-    imageAlt: 'Classic fountain pen',
-    rating: 5
-  },
-  {
-    id: 9,
-    name: 'Desk Organizer',
-    href: '#',
-    price: '$40',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-03.jpg',
-    imageAlt: 'Wooden desk organizer',
-    rating: 4
-  },
-  {
-    id: 10,
-    name: 'Wireless Charger',
-    href: '#',
-    price: '$70',
-    imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-02.jpg',
-    imageAlt: 'Fast wireless charger',
-    rating: 4
-  },
-  // Add more if needed
+  }
 ]
 
 const PRODUCTS_PER_PAGE = 9
 
 export default function ProductsList() {
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE)
+  // Filter products by search query (case insensitive)
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
-  const paginatedProducts = products.slice(
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+
+  const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE
   )
@@ -195,20 +120,39 @@ export default function ProductsList() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page when search changes
+  }
+
   return (
-    <div className="bg-white borde">
-      <div className="mx-auto max-w-2xl px-4  sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:py-0">
+    <div className="bg-white">
+      <div className="flex items-center justify-center space-x-2 my-4 max-w-lg  mx-auto">
+        <Input
+          type="text"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="flex-grow"
+        />
+        <Search className="w-6 h-6 text-gray-400" />
+      </div>
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:py-0">
         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8">
-          {paginatedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              name={product.name}
-              description={product.imageAlt}
-              image={product.imageSrc}
-              price={product.price}
-              rating={product.rating}
-            />
-          ))}
+          {paginatedProducts.length > 0 ? (
+            paginatedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                description={product.imageAlt}
+                image={product.imageSrc}
+                price={product.price}
+                rating={product.rating}
+              />
+            ))
+          ) : (
+            <p className="text-center col-span-full text-gray-500">No products found.</p>
+          )}
         </div>
 
         {/* Pagination Controls */}
