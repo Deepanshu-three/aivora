@@ -1,12 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -14,45 +10,184 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  email       String    @unique
+  password    String?
+  phoneNumber String?
+  address     String?
+  city        String?
+  state       String?
+  postalCode  String?
+  country     String?
+  createdAt   DateTime  @default(now())
 
-model Product {
-  id            String        @id @default(cuid())
-  title         String
-  description   String
-  price         Float
-  imageUrl      String
-  isNewRelease  Boolean       @default(false)
-  isBestSeller  Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  reviews       Review[]
-  orderItems    OrderItem[]
+  orders      Order[]
+  reviews     Review[]
+  cart        Cart?
+  wishlist    Wishlist?
 }
 
-model Review {
-  id        String    @id @default(cuid())
-  content   String
-  rating    Int       // 1 to 5
-  userId    String    // Clerk user ID
-  product   Product   @relation(fields: [productId], references: [id])
-  productId String
-  createdAt DateTime  @default(now())
+model Category {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+
+  products    Product[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  addInfo     String? 
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  orderItems    OrderItem[]
+  reviews       Review[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  userId    String      // Clerk user ID
-  items     OrderItem[]
-  total     Float
-  createdAt DateTime    @default(now())
+  id              Int           @id @default(autoincrement())
+  totalAmount     Float
+  status          OrderStatus   @default(pending)
+  shippingAddress String?
+  paymentStatus   PaymentStatus @default(pending)
+  createdAt       DateTime      @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  orderItems OrderItem[]
+  payment    Payment?
+  shipping   Shipping?
+}
+
+enum OrderStatus {
+  pending
+  shipped
+  delivered
+  canceled
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
 }
 
 model OrderItem {
-  id        String    @id @default(cuid())
-  product   Product   @relation(fields: [productId], references: [id])
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  price    Float
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
   productId String
-  quantity  Int
-  price     Float      // Price at the time of order
-  order     Order      @relation(fields: [orderId], references: [id])
-  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id            Int           @id @default(autoincrement())
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(pending)
+  paymentAmount Float
+  transactionId String?
+  paymentDate   DateTime      @default(now())
+
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+}
+
+enum PaymentMethod {
+  credit_card
+  paypal
+  bank_transfer
+  cash_on_delivery
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      @default(1) @map("rating") // Check for range constraint
+  comment   String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId String  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id       Int @id @default(autoincrement())
+  quantity Int @default(1)
+
+  cartId Int
+  cart   Cart @relation(fields: [cartId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Shipping {
+  id              Int            @id @default(autoincrement())
+  shippingAddress String
+  city            String
+  state           String
+  postalCode      String
+  country         String
+  shippingStatus  ShippingStatus @default(processing)
+  trackingNumber  String?
+  shippingDate    DateTime       @default(now())
+
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+}
+
+enum ShippingStatus {
+  processing
+  shipped
+  delivered
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId String  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  wishlistItems WishlistItem[]
+}
+
+model WishlistItem {
+  id Int @id @default(autoincrement())
+
+  wishlistId Int
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 }

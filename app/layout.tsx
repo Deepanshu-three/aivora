@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Toaster } from "sonner";
 
 // Import Poppins font
 const poppins = Poppins({
@@ -40,6 +41,7 @@ export default async function RootLayout({
                         <div className="w-full overflow-x-hidden">
                             {children}
                         </div>
+                        <Toaster />
                     </main>
                     {/* Footer - Always at the bottom */}
                     <div className="w-full shadow-md bg-white">
