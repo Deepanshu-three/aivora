@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "sonner";
+import { CartProvider } from "./context/CartContext";
 
 // Import Poppins font
 const poppins = Poppins({
@@ -29,6 +30,7 @@ export default async function RootLayout({
 
   return (
     <ClerkProvider>
+      <CartProvider>
       <html lang="en">
         <body className={`${poppins.variable} font-sans antialiased bg-background text-foreground`}>
           {/* Navbar - Fixed at the top */}
@@ -49,6 +51,7 @@ export default async function RootLayout({
                     </div>
         </body>
       </html>
+      </CartProvider>
     </ClerkProvider>
   );
 }

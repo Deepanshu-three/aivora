@@ -1,7 +1,7 @@
 'use client';
 
+import ProductCard from '@/components/ProductCard';
 import React from 'react';
-import ProductCard from '../../../components/ProductCard';
 
 const products = [
   {
@@ -36,23 +36,11 @@ const products = [
     description: 'Your personal fitness companion.',
     rating: 4.3,
   },
-  {
-    id: 5,
-    name: 'Fitness Tracker',
-    price: '$99',
-    image: 'https://5.imimg.com/data5/SELLER/Default/2023/2/DM/NE/VU/109701326/robot-spare-parts-500x500.jpeg',
-    description: 'Your personal fitness companion.',
-    rating: 4.0,
-  },
 ];
 
-const BestSeller = () => {
+const SimilarProducts = () => {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 md:px-16 py-10">
-      <h2 className="text-3xl sm:text-4xl font-bold text-left mb-10 text-gray-900">
-        Best Sellers
-      </h2>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <ProductCard
@@ -70,4 +58,4 @@ const BestSeller = () => {
   );
 };
 
-export default BestSeller;
+export default SimilarProducts;

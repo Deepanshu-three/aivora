@@ -21,7 +21,6 @@ import { Modal } from "@/components/Modal";
 
 // Modal Component with keyboard escape close support and focus trap could be added later if needed
 
-
 type Category = {
   id: string;
   name: string;
@@ -31,10 +30,8 @@ type Category = {
 type AddProductModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onProductAdded: () => void;  // to notify parent to refresh product list
+  onProductAdded: () => void; // to notify parent to refresh product list
 };
-
-
 
 export default function AddProductModal({
   isOpen,
@@ -49,8 +46,13 @@ export default function AddProductModal({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
       name: "",
-      description: "",
       addInfo: "",
+      title: "",
+      description: "",
+      brand: "",
+      dimensions: "",
+      weight: "",
+      manufacture: "",
       price: 0,
       stock: 0,
       productImage: null,
@@ -99,6 +101,12 @@ export default function AddProductModal({
         stock: data.stock,
         productImage: uploadedImageUrl,
         category: data.category,
+        brand: data.brand,
+        manufacture: data.manufacture,
+        title: data.title,
+        dimensions: data.dimensions,
+        weight: data.weight
+
       };
 
       await axios.post("/api/products", productPayload);
@@ -121,7 +129,10 @@ export default function AddProductModal({
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 w-full"
+          >
             <h2 className="text-2xl font-semibold text-center text-[#0C6170]">
               Add New Product
             </h2>
@@ -139,6 +150,22 @@ export default function AddProductModal({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Product Title"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -147,7 +174,63 @@ export default function AddProductModal({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Product Description (optional)" {...field} />
+                    <Textarea
+                      placeholder="Product Description"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="brand"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Brand</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Product Brand" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="manufacture"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Manufacture</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Product Manufacture" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dimensions"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Dimensions</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Product Dimensions" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Weight</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Product Dimensions" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -161,7 +244,10 @@ export default function AddProductModal({
                 <FormItem>
                   <FormLabel>Additional Info</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Additional information (optional)" {...field} />
+                    <Textarea
+                      placeholder="Additional information"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import React from "react";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/app/context/CartContext";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const fullStars = Math.floor(rating);
@@ -19,6 +20,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 interface Product {
+  id: string;
   name: string;
   image: string;
   rating: number;
@@ -27,34 +29,51 @@ interface Product {
 }
 
 const ProductCard = (product: Product) => {
+  const { addToCart } = useCart();
+  const router = useRouter();
+
   return (
-    <div className="cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-105 hover:-translate-y-1 hover:shadow-2xl">
-      <Card className="overflow-hidden rounded-md bg-white shadow-md">
-        <CardHeader className="h-full w-full overflow-hidden ">
+    <div className="group flex flex-col justify-between bg-white rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl h-full cursor-pointer">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => router.push(`/products/${product.id}`)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            router.push(`/products/${product.id}`);
+          }
+        }}
+      >
+        {/* Image */}
+        <div className="w-full aspect-[4/3] overflow-hidden">
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover rounded-b-sm"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
-        </CardHeader>
+        </div>
 
-        <CardContent>
+        {/* Content */}
+        <div className="flex flex-col justify-between flex-grow p-4 space-y-2">
           <StarRating rating={product.rating} />
-          <div className="flex justify-between items-center mt-2">
-            <h3 className="text-lg font-semibold text-gray-800">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800 truncate">
               {product.name}
             </h3>
             <span className="text-primary font-bold">{product.price}</span>
           </div>
-          <p className="text-sm text-gray-600 mt-1">{product.description}</p>
-        </CardContent>
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {product.description}
+          </p>
+        </div>
+      </div>
 
-        <CardFooter className="p-4 pt-2">
-          <Button className="w-full" variant="default">
-            Add to Cart
-          </Button>
-        </CardFooter>
-      </Card>
+      {/* Footer */}
+      <div className="p-4 pt-0">
+        <Button className="w-full" onClick={() => addToCart(product.id)}>
+          Add to Cart
+        </Button>
+      </div>
     </div>
   );
 };

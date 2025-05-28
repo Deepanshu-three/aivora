@@ -10,10 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, User, LogOut, Menu, X } from "lucide-react";
+import { ChevronDown, User, LogOut, Menu, X, ShoppingCart } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useUser, SignedOut } from "@clerk/nextjs";
+import ShoppingCartCom from "./cart";
 
 type navlinkType = {
   link: string;
@@ -52,7 +53,6 @@ const Navbar = () => {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const profileImage = isSignedIn || "default-avatar.jpg";
 
   return (
     <nav className="fixed top0 left-0 right-0 bg-white backdrop:blur-sm z-50 border-b border-gray-100 shadow-sm">
@@ -97,6 +97,7 @@ const Navbar = () => {
             </Link>
           ) : (
             <div className="flex items-center justify-center">
+              <ShoppingCartCom />
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 rounded-lg cursor-pointer transition-all duration-200">
                   <img

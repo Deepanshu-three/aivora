@@ -27,6 +27,11 @@ type Category = {
 
 type Product = {
   id: string;
+  brand?: string;
+  manufacture?: string;
+  dimensions?: string;
+  weight?: string;
+  title?: string;
   name: string;
   price: number;
   stock: number;
@@ -59,8 +64,13 @@ export default function EditProductModal({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
       name: "",
-      description: "",
       addInfo: "",
+      title: "",
+      description: "",
+      brand: "",
+      dimensions: "",
+      weight: "",
+      manufacture: "",
       price: 0,
       stock: 0,
       productImage: null,
@@ -71,13 +81,18 @@ export default function EditProductModal({
   useEffect(() => {
     if (product) {
       form.reset({
-        name: product.name,
+        name: product.name || "",
         description: product.description || "",
         addInfo: product.addInfo || "",
-        price: product.price,
-        stock: product.stock,
+        price: product.price || 0,
+        stock: product.stock || 0,
         productImage: null,
         category: product.category?.id || "",
+        brand: product.brand || "",
+        dimensions: product.dimensions || "",
+        weight: product.weight || "",
+        manufacture: product.manufacture || "",
+        title: product.title || "",
       });
     }
   }, [product, form]);
@@ -123,6 +138,11 @@ export default function EditProductModal({
         stock: data.stock,
         productImage: uploadedImageUrl,
         category: data.category,
+        brand: data.brand,
+        manufacture: data.manufacture,
+        title: data.title,
+        weight: data.weight,
+        dimensions: data.dimensions,
       };
 
       if (product?.id) {
@@ -161,7 +181,19 @@ export default function EditProductModal({
               </FormItem>
             )}
           />
-
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Product Title" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="description"
@@ -170,6 +202,59 @@ export default function EditProductModal({
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea placeholder="Description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="brand"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Brand</FormLabel>
+                <FormControl>
+                  <Input placeholder="Product Brand" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="manufacture"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Manufacture</FormLabel>
+                <FormControl>
+                  <Input placeholder="Product Manufacture" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dimensions"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Dimensions</FormLabel>
+                <FormControl>
+                  <Input placeholder="Product Dimensions" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Weight</FormLabel>
+                <FormControl>
+                  <Input placeholder="Product Dimensions" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
