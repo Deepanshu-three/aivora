@@ -55,8 +55,9 @@ export default function AddProductModal({
       manufacture: "",
       price: 0,
       stock: 0,
-      productImage: null,
+      productImages: [],
       category: "",
+      material: ""
     },
   });
 
@@ -74,52 +75,58 @@ export default function AddProductModal({
   }, []);
 
   const onSubmit = async () => {
-    setIsSubmitting(true);
-    const data = form.getValues();
+  setIsSubmitting(true);
+  const data = form.getValues();
 
-    try {
-      let uploadedImageUrl = "";
+  try {
+    let uploadedImageUrls: string[] = [];
 
-      if (data.productImage && data.productImage.length > 0) {
-        const imageFormData = new FormData();
-        imageFormData.append("file", data.productImage[0]);
+    if (data.productImages && data.productImages.length > 0) {
+      const imageFormData = new FormData();
 
-        const imageUploadRes = await axios.post("/api/upload", imageFormData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+      data.productImages.forEach((file: File) => {
+        imageFormData.append("files", file); // name must match backend field
+      });
 
-        uploadedImageUrl = imageUploadRes.data.imageUrl;
-      }
+      const imageUploadRes = await axios.post("/api/upload", imageFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      const productPayload = {
-        name: data.name,
-        description: data.description || "",
-        addInfo: data.addInfo || "",
-        price: data.price,
-        stock: data.stock,
-        productImage: uploadedImageUrl,
-        category: data.category,
-        brand: data.brand,
-        manufacture: data.manufacture,
-        title: data.title,
-        dimensions: data.dimensions,
-        weight: data.weight
-
-      };
-
-      await axios.post("/api/products", productPayload);
-
-      form.reset();
-      setIsModalOpen(false); // Close modal on success
-    } catch (error) {
-      console.error("Error uploading product", error);
-      // Ideally add toast.error here
-    } finally {
-      setIsSubmitting(false);
+      // Assuming your backend returns an array of image URLs
+      uploadedImageUrls = imageUploadRes.data.imageUrls;
     }
-  };
+
+    const productPayload = {
+      name: data.name,
+      description: data.description || "",
+      addInfo: data.addInfo || "",
+      price: data.price,
+      stock: data.stock,
+      productImages: uploadedImageUrls, // ⬅️ send array now
+      category: data.category,
+      brand: data.brand,
+      manufacture: data.manufacture,
+      title: data.title,
+      dimensions: data.dimensions,
+      weight: data.weight,
+      material: data.material
+
+    };
+
+    await axios.post("/api/products", productPayload);
+
+    form.reset();
+    setIsModalOpen(false);
+  } catch (error) {
+    console.error("Error uploading product", error);
+    // toast.error("Something went wrong");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <>
@@ -157,10 +164,7 @@ export default function AddProductModal({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Product Title"
-                      {...field}
-                    />
+                    <Textarea placeholder="Product Title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,10 +178,7 @@ export default function AddProductModal({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Product Description"
-                      {...field}
-                    />
+                    <Textarea placeholder="Product Description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -239,15 +240,26 @@ export default function AddProductModal({
 
             <FormField
               control={form.control}
+              name="material"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Material</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Product Material" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="addInfo"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Additional Info</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Additional information"
-                      {...field}
-                    />
+                    <Textarea placeholder="Additional information" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -303,15 +315,19 @@ export default function AddProductModal({
 
             <FormField
               control={form.control}
-              name="productImage"
+              name="productImages"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Image</FormLabel>
+                  <FormLabel>Product Images</FormLabel>
                   <FormControl>
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => field.onChange(e.target.files)}
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files ?? []);
+                        field.onChange(files);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

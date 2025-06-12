@@ -22,14 +22,22 @@ type CartItemWithProduct = {
     id: string;
     name: string;
     price: number;
-    imageUrl?: string;
-  }
+    images?: {
+      id: string;
+      url: string;
+    }[];
+  };
 };
 
 export default function Cart() {
-  const [open, setOpen] = useState(false); // Default to closed  
-  const { cartItems, fetchCart, incrementQuantity, decrementQuantity , removeFromCart} = useCart(); 
-
+  const [open, setOpen] = useState(false); // Default to closed
+  const {
+    cartItems,
+    fetchCart,
+    incrementQuantity,
+    decrementQuantity,
+    removeFromCart,
+  } = useCart();
 
   useEffect(() => {
     fetchCart();
@@ -106,63 +114,84 @@ export default function Cart() {
                           role="list"
                           className="-my-6 divide-y divide-gray-200"
                         >
-                          {cartItems.map((productItem : CartItemWithProduct, index: number) => (
-                            <li key={productItem.id} className="flex py-6">
-                              <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                <img
-                                  alt={"product image"}
-                                  src={productItem.product.imageUrl}
-                                  className="size-full object-cover"
-                                />
-                              </div>
+                          {cartItems.map(
+                            (
+                              productItem: CartItemWithProduct,
+                              index: number
+                            ) => (
+                              <li key={productItem.id} className="flex py-6">
+                                <div className="w-24 h-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                  <img
+                                    alt="product image"
+                                    src={
+                                      productItem.product.images?.[0]?.url ||
+                                      "/placeholder.jpg"
+                                    }
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
 
-                              <div className="ml-4 flex flex-1 flex-col">
-                                <div>
-                                  <div className="flex justify-between text-base font-medium text-gray-900">
-                                    <h3>
-                                      <Link
-                                        href={`/products/${productItem.product.id}`}
+                                <div className="ml-4 flex flex-1 flex-col">
+                                  <div>
+                                    <div className="flex justify-between text-base font-medium text-gray-900">
+                                      <h3>
+                                        <Link
+                                          href={`/products/${productItem.product.id}`}
+                                        >
+                                          {productItem.product.name}
+                                        </Link>
+                                      </h3>
+                                      <p className="ml-4">
+                                        {typeof productItem.product.price ===
+                                        "number"
+                                          ? productItem.product.price.toFixed(2)
+                                          : productItem.product.price}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-1 items-end justify-between text-sm">
+                                    <div className="flex items-center gap-2 text-gray-500">
+                                      <button
+                                        type="button"
+                                        className="px-2 py-1 border rounded cursor-pointer"
+                                        onClick={() =>
+                                          decrementQuantity(
+                                            productItem.product.id
+                                          )
+                                        }
                                       >
-                                        {productItem.product.name}
-                                      </Link>
-                                    </h3>
-                                    <p className="ml-4">
-                                      {productItem.product.price}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="flex flex-1 items-end justify-between text-sm">
-                                  <div className="flex items-center gap-2 text-gray-500">
-                                    <button
-                                      type="button"
-                                      className="px-2 py-1 border rounded cursor-pointer"
-                                      onClick={() => decrementQuantity(productItem.product.id)}
-                                    >
-                                      -
-                                    </button>
-                                    <p>Qty {productItem.quantity}</p>
-                                    <button
-                                      type="button"
-                                      className="px-2 py-1 border rounded cursor-pointer"
-                                      onClick={() => incrementQuantity(productItem.product.id)}
-                                    >
-                                      +
-                                    </button>
-                                  </div>
+                                        -
+                                      </button>
+                                      <p>Qty {productItem.quantity}</p>
+                                      <button
+                                        type="button"
+                                        className="px-2 py-1 border rounded cursor-pointer"
+                                        onClick={() =>
+                                          incrementQuantity(
+                                            productItem.product.id
+                                          )
+                                        }
+                                      >
+                                        +
+                                      </button>
+                                    </div>
 
-                                  <div className="flex">
-                                    <button
-                                      type="button"
-                                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                                      onClick={() => removeFromCart(productItem.product.id)}
-                                    >
-                                      Remove
-                                    </button>
+                                    <div className="flex">
+                                      <button
+                                        type="button"
+                                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                                        onClick={() =>
+                                          removeFromCart(productItem.product.id)
+                                        }
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </li>
-                          ))}
+                              </li>
+                            )
+                          )}
                         </ul>
                       </div>
                     </div>
@@ -177,12 +206,12 @@ export default function Cart() {
                       Shipping and taxes calculated at checkout.
                     </p>
                     <div className="mt-6">
-                      <a
-                        href="#"
+                      <Link
+                        href="/checkout"
                         className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700"
                       >
                         Checkout
-                      </a>
+                      </Link>
                     </div>
                     <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                       <p>

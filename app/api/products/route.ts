@@ -4,13 +4,13 @@ import db from "@/lib/prisma";
 // /api/products/route.ts
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
-  }
-
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthenticated" }, { status: 401 });
+    }
+
     const {
       name,
       description,
@@ -23,30 +23,43 @@ export async function POST(req: NextRequest) {
       stock,
       addInfo,
       category,
-      productImage, // This is the uploaded Cloudinary URL
+      productImages, // Now expecting an array of image URLs
     } = await req.json();
 
-    if (!name || !price || !stock || !category || !productImage) {
+    // Basic validation
+    if (
+      !name ||
+      !price ||
+      !stock ||
+      !category ||
+      !productImages ||
+      productImages.length === 0
+    ) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
       );
     }
 
+    // Create product with related images
     const product = await db.product.create({
       data: {
         name,
-        description: description || "",
-        price,
-        stock,
+        title,
+        description,
         brand,
+        dimensions,
         weight,
         manufacture,
-        title,
-        dimensions,
-        addInfo: addInfo || "",
+        price,
+        stock,
+        addInfo,
         categoryId: category,
-        imageUrl: productImage,
+        images: {
+          create: productImages.map((url: string) => ({
+            url,
+          })),
+        },
       },
     });
 
@@ -57,7 +70,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     return NextResponse.json(
       {
-        message: "poduct not created",
+        message: "Product not created",
         error: (err as Error).message || String(err),
       },
       { status: 500 }
@@ -71,7 +84,12 @@ export async function GET() {
       include: {
         category: {
           select: {
-            name: true, // only get category name
+            name: true,
+          },
+        },
+        images: {
+          select: {
+            url: true, // only get image URLs
           },
         },
       },
@@ -79,10 +97,10 @@ export async function GET() {
 
     return NextResponse.json({ products }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching products:", error);
     return NextResponse.json(
       { message: "Unable to fetch products" },
-      { status: 401 }
+      { status: 500 }
     );
   }
 }

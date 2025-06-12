@@ -17,7 +17,7 @@ import SimilarProducts from "./_components/SimilarProducts";
 import axios from "axios";
 import { toast } from "sonner";
 import { useCart } from "@/app/context/CartContext";
-
+import ImageCarousel from "@/components/ImageCarousel";
 
 type Product = {
   id: string;
@@ -31,7 +31,10 @@ type Product = {
   stock: number;
   addInfo: string;
   description: string;
-  imageUrl?: string;
+  images: {
+    id: string;
+    url: string;
+  }[];
   category?: {
     id: string;
     name: string;
@@ -41,7 +44,7 @@ type Product = {
 function StarRating({ rating }: { rating: number }) {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
-  
+
   return (
     <div className="flex items-center space-x-1">
       {Array.from({ length: fullStars }).map((_, i) => (
@@ -60,7 +63,7 @@ export default function ProductDetailPage() {
   const { id } = params;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [cartLoading, setCartLoading] = useState(false)
+  const [cartLoading, setCartLoading] = useState(false);
   const { addToCart } = useCart();
 
   const fetchProduct = async () => {
@@ -75,22 +78,7 @@ export default function ProductDetailPage() {
       setLoading(false);
     }
   };
-  // const addToCart = async () => {
-  //   try {
-  //     setCartLoading(true)
-  //     const res = await axios.post(`/api/cart/${id}`);
-  //     if (res.status === 200) {
-  //       toast.success("Added to cart!");
-  //     } else {
-  //       toast.warning("Something went wrong. Try again.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Add to cart error:", error);
-  //     toast.error("Failed to add to cart. Please try again later.");
-  //   }finally{
-  //     setCartLoading(false)
-  //   }
-  // };
+
   useEffect(() => {
     fetchProduct();
   }, [id]);
@@ -140,6 +128,7 @@ export default function ProductDetailPage() {
   }
 
   const rating = 4;
+  console.log(product?.images)
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -147,11 +136,9 @@ export default function ProductDetailPage() {
         {/* Product Image + Details */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <div className="w-full lg:w-1/2">
-            <img
-              src={product!.imageUrl}
-              alt={product!.name}
-              className="rounded-xl w-full h-auto object-contain border"
-            />
+            {product?.images  && (
+                <ImageCarousel images={product.images} />
+              )}
           </div>
 
           <div className="flex-1 space-y-4 text-base sm:text-lg">
@@ -185,7 +172,11 @@ export default function ProductDetailPage() {
                 disabled={product!.stock === 0 || cartLoading}
                 onClick={() => addToCart(product!.id)}
               >
-               {cartLoading ? <Loader2Icon className="animate-spin" /> : "Add to cart" }
+                {cartLoading ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : (
+                  "Add to cart"
+                )}
               </Button>
             </div>
             <div className="text-gray-600">

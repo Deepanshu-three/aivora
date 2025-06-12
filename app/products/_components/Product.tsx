@@ -8,19 +8,30 @@ import { toast } from "sonner";
 import axios from "axios";
 
 const PRODUCTS_PER_PAGE = 9;
-
 type Product = {
   id: string;
   name: string;
+  title?: string;
+  description?: string;
+  brand?: string;
+  dimensions?: string;
+  weight?: string;
+  manufacture?: string;
   price: number;
   stock: number;
-  addInfo: string;
-  description: string;
+  addInfo?: string;
+  material?: string;
+  createdAt: Date;
+
   category?: {
     id: string;
     name: string;
   };
-  imageUrl?: string;
+
+  images: {
+    id: string;
+    url: string;
+  }[];
 };
 
 interface ProductFilterProps {
@@ -130,9 +141,11 @@ export default function ProductsList({ filters }: ProductFilterProps) {
                 id={product.id}
                 key={product.id}
                 name={product.name}
-                description={product.description}
-                image={product.imageUrl || ""}
+                description={product.title!}
+                image={product.images[0].url || ""}
                 price={product.price.toString()}
+                category={product.category?.name!}
+                material={product.material!}
                 rating={4}
               />
             ))

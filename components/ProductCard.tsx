@@ -26,6 +26,8 @@ interface Product {
   rating: number;
   price: string;
   description: string;
+  category: string;
+  material: string;
 }
 
 const ProductCard = (product: Product) => {
@@ -54,17 +56,36 @@ const ProductCard = (product: Product) => {
         </div>
 
         {/* Content */}
-        <div className="flex flex-col justify-between flex-grow p-4 space-y-2">
-          <StarRating rating={product.rating} />
+        <div className="flex flex-col justify-between flex-grow p-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-800 truncate">
+            <h3 className="text-2xl font-semibold text-gray-800 truncate">
               {product.name}
             </h3>
-            <span className="text-primary font-bold">{product.price}</span>
+          </div>
+          <div className="my-2">
+
+            <StarRating rating={product.rating} />
           </div>
           <p className="text-sm text-gray-600 line-clamp-2">
             {product.description}
           </p>
+          <div className="mt-4 flex space-y-2 flex-col justify-around">
+            <span className="font-bold">
+              Category:{" "}
+              <span className="text-muted-foreground">
+                {product.category || "NA"}
+              </span>{" "}
+            </span>
+            <span className="font-bold">
+              Material:{" "}
+              <span className="text-muted-foreground">
+                {product.material || "NA"}
+              </span>{" "}
+            </span>
+          </div>
+          <span className="text-right text-2xl text-primary font-extrabold">
+            Rs.{product.price}
+          </span>
         </div>
       </div>
 

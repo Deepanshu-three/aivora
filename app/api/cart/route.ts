@@ -10,13 +10,19 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const userWithCart = await db.user.findUnique({
+    let userWithCart = await db.user.findUnique({
       where: { id: user.id },
       include: {
         cart: {
           include: {
             cartItems: {
-              include: { product: true },
+              include: {
+                product: {
+                  include: {
+                    images: true, // 👈 includes images
+                  },
+                },
+              },
             },
           },
         },
@@ -24,7 +30,7 @@ export async function GET() {
     });
 
     if (!userWithCart) {
-      return NextResponse.json({ message: "Cart not found" }, { status: 404 });
+      return NextResponse.json({});
     }
 
     return NextResponse.json(userWithCart);
@@ -37,9 +43,7 @@ export async function GET() {
   }
 }
 
-export async function POST(
-  req: NextRequest
-) {
+export async function POST(req: NextRequest) {
   try {
     const user = await currentUser();
     if (!user || !user.id) {
@@ -70,7 +74,7 @@ export async function POST(
       });
     }
 
-    const body = await req.json()
+    const body = await req.json();
 
     const productId = body.productId;
 
@@ -128,7 +132,8 @@ export async function POST(
 export async function PATCH(req: Request) {
   try {
     const user = await currentUser();
-    if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!user)
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const { productId, quantity } = await req.json();
 
@@ -141,7 +146,8 @@ export async function PATCH(req: Request) {
       include: { cartItems: true },
     });
 
-    if (!cart) return NextResponse.json({ message: "Cart not found" }, { status: 404 });
+    if (!cart)
+      return NextResponse.json({ message: "Cart not found" }, { status: 404 });
 
     await db.cartItem.updateMany({
       where: {
@@ -156,10 +162,12 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "Cart updated" });
   } catch (error) {
     console.error("Error updating cart item:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
-
 
 export async function DELETE(req: Request) {
   try {
@@ -183,10 +191,15 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ message: "Cart not found" }, { status: 404 });
     }
 
-    const itemToDelete = cart.cartItems.find((item) => item.productId === productId);
+    const itemToDelete = cart.cartItems.find(
+      (item) => item.productId === productId
+    );
 
     if (!itemToDelete) {
-      return NextResponse.json({ message: "Product not found in cart" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Product not found in cart" },
+        { status: 404 }
+      );
     }
 
     await db.cartItem.delete({
@@ -198,6 +211,9 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ message: "Product removed from cart" });
   } catch (error) {
     console.error("Error deleting cart item:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

@@ -73,7 +73,7 @@ export default function EditProductModal({
       manufacture: "",
       price: 0,
       stock: 0,
-      productImage: null,
+      productImages: [],
       category: "",
     },
   });
@@ -86,7 +86,7 @@ export default function EditProductModal({
         addInfo: product.addInfo || "",
         price: product.price || 0,
         stock: product.stock || 0,
-        productImage: null,
+        productImages: product.productImage ? [product.productImage] : [],
         category: product.category?.id || "",
         brand: product.brand || "",
         dimensions: product.dimensions || "",
@@ -115,11 +115,14 @@ export default function EditProductModal({
     const data = form.getValues();
 
     try {
-      let uploadedImageUrl = product?.productImage || "";
+      let uploadedImageUrls: string[] = [];
 
-      if (data.productImage && data.productImage.length > 0) {
+      if (data.productImages && data.productImages.length > 0) {
         const imageFormData = new FormData();
-        imageFormData.append("file", data.productImage[0]);
+
+        data.productImages.forEach((file: File) => {
+          imageFormData.append("files", file); // name must match backend field
+        });
 
         const imageUploadRes = await axios.post("/api/upload", imageFormData, {
           headers: {
@@ -127,7 +130,8 @@ export default function EditProductModal({
           },
         });
 
-        uploadedImageUrl = imageUploadRes.data.imageUrl;
+        // Assuming your backend returns an array of image URLs
+        uploadedImageUrls = imageUploadRes.data.imageUrls;
       }
 
       const productPayload = {
@@ -136,7 +140,7 @@ export default function EditProductModal({
         addInfo: data.addInfo,
         price: data.price,
         stock: data.stock,
-        productImage: uploadedImageUrl,
+        productImage: uploadedImageUrls,
         category: data.category,
         brand: data.brand,
         manufacture: data.manufacture,
@@ -330,7 +334,7 @@ export default function EditProductModal({
 
           <FormField
             control={form.control}
-            name="productImage"
+            name="productImages"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Image</FormLabel>

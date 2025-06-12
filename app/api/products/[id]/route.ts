@@ -23,7 +23,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             name: true, // only get category name
           },
         },
+         images: {
+          select: {
+            url: true, // only get image URLs
+          },
+        },
       },
+      
     });
 
     if (!res) {
@@ -64,7 +70,7 @@ export async function PUT(
       addInfo,
       price,
       stock,
-      productImage,
+      productImages,
       category, // category ID
     } = body;
 
@@ -88,7 +94,11 @@ export async function PUT(
         manufacture,
         title,
         dimensions,
-        imageUrl: productImage,
+        images: {
+          create: productImages.map((url: string) => ({
+            url,
+          })),
+        },
         categoryId: category,
       },
     });

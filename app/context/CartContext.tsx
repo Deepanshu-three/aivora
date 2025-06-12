@@ -16,7 +16,10 @@ interface Product {
   price: number;
   stock: number;
   addInfo?: string;
-  imageUrl?: string;
+  images?: {
+    id: string,
+    url: string
+  }[];
   createdAt: string;
   categoryId?: string;
 }
