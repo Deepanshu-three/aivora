@@ -28,14 +28,10 @@ type Category = {
 };
 
 type AddProductModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
   onProductAdded: () => void; // to notify parent to refresh product list
 };
 
 export default function AddProductModal({
-  isOpen,
-  onClose,
   onProductAdded,
 }: AddProductModalProps) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -118,6 +114,7 @@ export default function AddProductModal({
     await axios.post("/api/products", productPayload);
 
     form.reset();
+    onProductAdded()
     setIsModalOpen(false);
   } catch (error) {
     console.error("Error uploading product", error);

@@ -17,8 +17,8 @@ interface Product {
   stock: number;
   addInfo?: string;
   images?: {
-    id: string,
-    url: string
+    id: string;
+    url: string;
   }[];
   createdAt: string;
   categoryId?: string;
@@ -40,6 +40,7 @@ interface CartContextType {
   removeFromCart: (productId: string) => Promise<void>;
   incrementQuantity: (productId: string) => Promise<void>;
   decrementQuantity: (productId: string) => Promise<void>;
+  clearCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -105,6 +106,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Failed to decrement quantity:", error);
     }
   };
+  const clearCart = async () => {
+    try {
+      await axios.delete("/api/cart/clear"); // 🔧 Ensure your backend route handles this
+      await fetchCart();
+      toast.success("Cart cleared!");
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      toast.error("Failed to clear cart.");
+    }
+  };
 
   useEffect(() => {
     fetchCart();
@@ -120,6 +131,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         removeFromCart,
         incrementQuantity,
         decrementQuantity,
+        clearCart
       }}
     >
       {children}
