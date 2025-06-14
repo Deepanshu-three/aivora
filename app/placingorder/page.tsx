@@ -9,6 +9,7 @@ import { useCart } from "../context/CartContext";
 import { createOrder } from "../util/createOrder";
 import Script from "next/script";
 
+
 export default function PlacingOrderPage() {
   const searchParams = useSearchParams();
   const router = useRouter();

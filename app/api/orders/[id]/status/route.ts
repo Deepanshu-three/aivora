@@ -1,39 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
+// app/api/orders/[id]/status/route.ts
+import db from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
-type Order = {
-  id: string;
-  customerName: string;
-  productName: string;
-  quantity: number;
-  status: string;
-  createdAt: string;
-};
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { status, trackingId } = await req.json();
 
-// Dummy data (same as above, but in real you’ll have shared DB)
-let orders: Order[] = Array.from({ length: 27 }).map((_, i) => ({
-  id: (i + 1).toString(),
-  customerName: `Customer ${i + 1}`,
-  productName: `Product ${((i % 5) + 1)}`,
-  quantity: Math.floor(Math.random() * 5) + 1,
-  status: ['Pending', 'In Progress', 'Completed'][i % 3],
-  createdAt: new Date(Date.now() - i * 1000 * 60 * 60 * 24).toISOString(),
-}));
+    if (!["pending", "shipped", "delivered", "canceled"].includes(status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-  const body = await request.json();
-  const { status } = body;
+    if (status === "shipped" && !trackingId) {
+      return NextResponse.json({ message: "Please provide the tracking ID" }, { status: 400 });
+    }
 
-  if (!status || typeof status !== 'string') {
-    return NextResponse.json({ error: 'Status is required and must be a string' }, { status: 400 });
+    const updatedOrder = await db.order.update({
+      where: { id: params.id },
+      data: {
+        status,
+        trackingId: trackingId || null,
+      },
+    });
+
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (error) {
+    console.error("Failed to update order status:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-
-  const orderIndex = orders.findIndex(order => order.id === id);
-  if (orderIndex === -1) {
-    return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-  }
-
-  orders[orderIndex].status = status;
-
-  return NextResponse.json({ message: 'Status updated', order: orders[orderIndex] });
 }

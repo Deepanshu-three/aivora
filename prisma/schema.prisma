@@ -76,6 +76,7 @@ model Order {
   totalAmount     Float
   status          OrderStatus   @default(pending)
   shippingId      String?
+  trackingId      String?
   paymentStatus   PaymentStatus @default(pending)
   createdAt       DateTime      @default(now())
 
@@ -180,11 +181,6 @@ model Shipping {
 }
 
 
-enum ShippingStatus {
-  processing
-  shipped
-  delivered
-}
 
 model Wishlist {
   id        Int      @id @default(autoincrement())
