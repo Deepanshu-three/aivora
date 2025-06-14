@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, User, LogOut, Menu, X, ShoppingCart } from "lucide-react";
+import { ChevronDown, User, LogOut, Menu, X, ShoppingCart, BoxesIcon, ListOrderedIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useUser, SignedOut } from "@clerk/nextjs";
@@ -110,11 +110,11 @@ const Navbar = () => {
                 <DropdownMenuContent className="w-56">
                   <DropdownMenuItem asChild>
                     <Link
-                      href="/myappointments"
+                      href="/myOrders"
                       className="flex items-center px-4 py-2 rounded-md hover:bg-blue-200/60"
                     >
-                      <User className="mr-2 w-5 h-5" />
-                      My Appointments
+                      <ListOrderedIcon className="mr-2 w-5 h-5" />
+                      My Orders
                     </Link>
                   </DropdownMenuItem>
 

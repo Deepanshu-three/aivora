@@ -6,6 +6,9 @@ import Collection from './_components/Collection'
 import BestSeller from './_components/BestSellers'
 import Services from './_components/Services'
 import Newsfeed from './_components/Newsfeed'
+import CuttingEdge from './_components/CuttingEdge'
+import PrintingProcess from './_components/PrintingProcess'
+import { AchievementShowcase } from './_components/Achievements'
 
 
 const page = () => {
@@ -15,8 +18,11 @@ const page = () => {
         <Hero />
         <NewArrival />
         <Collection />
+        <PrintingProcess />
         <BestSeller />
+        <CuttingEdge />
         <Services />
+        <AchievementShowcase />
         <Newsfeed />
 
     </div>

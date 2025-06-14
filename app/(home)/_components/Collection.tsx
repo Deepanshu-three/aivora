@@ -1,5 +1,6 @@
 import { ForwardIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const Collection = () => {
@@ -10,11 +11,12 @@ const Collection = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[600px]">
-        {/* Left Large Card */}
-        <div
-          className="bg-gray-200  overflow-hidden flex flex-col rounded-md
-  transition-transform duration-300 ease-in-out transform hover:scale-105 
-  hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+        {/* Left Large Card - Robotic Parts */}
+        <Link
+          href="/products"
+          className="bg-gray-200 overflow-hidden flex flex-col rounded-md
+            transition-transform duration-300 ease-in-out transform hover:scale-105 
+            hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
         >
           <div className="flex-1 relative">
             <Image
@@ -33,19 +35,20 @@ const Collection = () => {
               <ForwardIcon className="w-5 h-5" />
             </div>
           </div>
-        </div>
+        </Link>
 
-        {/* Right Two Stacked Cards */}
+        {/* Right Two Stacked Cards - Drone and IC Chip */}
         <div className="flex flex-col gap-2">
           {[
             { src: "/home/drone.png", label: "Drone" },
             { src: "/home/ic.png", label: "IC Chip" },
           ].map((item, i) => (
-            <div
+            <Link
               key={i}
+              href="/products"
               className="bg-gray-200 overflow-hidden flex-1 flex flex-col rounded-md
-  transition-transform duration-300 ease-in-out transform hover:scale-105 
-  hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                transition-transform duration-300 ease-in-out transform hover:scale-105 
+                hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
             >
               <div className="flex-1 relative">
                 <Image
@@ -64,7 +67,7 @@ const Collection = () => {
                   <ForwardIcon className="w-5 h-5" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
