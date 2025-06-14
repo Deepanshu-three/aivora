@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs"; // ✅ Clerk user hook
 
 interface Product {
   id: string;
@@ -47,8 +48,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { isSignedIn } = useUser(); // ✅ check user auth status
 
   const fetchCart = async () => {
+    if (!isSignedIn) return; // ✅ prevent fetch if not signed in
     try {
       const res = await axios.get("/api/cart");
       setCartItems(res.data.cart?.cartItems || []);
@@ -58,6 +61,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const addToCart = async (productId: string, quantity: number = 1) => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to add items to your cart.");
+      return;
+    }
     try {
       await axios.post("/api/cart", { productId, quantity });
       await fetchCart();
@@ -69,6 +76,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeFromCart = async (productId: string) => {
+    if (!isSignedIn) return;
     try {
       await axios.delete("/api/cart", { data: { productId } });
       await fetchCart();
@@ -78,6 +86,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const incrementQuantity = async (productId: string) => {
+    if (!isSignedIn) return;
     const item = cartItems.find((item) => item.productId === productId);
     if (!item) return;
 
@@ -93,6 +102,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const decrementQuantity = async (productId: string) => {
+    if (!isSignedIn) return;
     const item = cartItems.find((item) => item.productId === productId);
     if (!item || item.quantity <= 1) return;
 
@@ -106,9 +116,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Failed to decrement quantity:", error);
     }
   };
+
   const clearCart = async () => {
+    if (!isSignedIn) return;
     try {
-      await axios.delete("/api/cart/clear"); // 🔧 Ensure your backend route handles this
+      await axios.delete("/api/cart/clear");
       await fetchCart();
       toast.success("Cart cleared!");
     } catch (error) {
@@ -119,7 +131,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [isSignedIn]); // ✅ watch sign-in state
 
   return (
     <CartContext.Provider
@@ -131,7 +143,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         removeFromCart,
         incrementQuantity,
         decrementQuantity,
-        clearCart
+        clearCart,
       }}
     >
       {children}

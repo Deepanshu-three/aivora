@@ -1,8 +1,11 @@
+"use client";
+
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/context/CartContext";
+import { useUser } from "@clerk/nextjs";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const fullStars = Math.floor(rating);
@@ -33,9 +36,19 @@ interface Product {
 const ProductCard = (product: Product) => {
   const { addToCart } = useCart();
   const router = useRouter();
+  const { isSignedIn } = useUser();
+
+  const handleAddToCart = () => {
+    if (!isSignedIn) {
+      router.push("/sign-in");
+    } else {
+      addToCart(product.id);
+    }
+  };
 
   return (
     <div className="group flex flex-col justify-between bg-white rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl h-full cursor-pointer">
+      {/* ✅ Only the upper part of the card navigates to the product page */}
       <div
         role="button"
         tabIndex={0}
@@ -46,7 +59,6 @@ const ProductCard = (product: Product) => {
           }
         }}
       >
-        {/* Image */}
         <div className="w-full aspect-[4/3] overflow-hidden">
           <img
             src={product.image}
@@ -55,7 +67,6 @@ const ProductCard = (product: Product) => {
           />
         </div>
 
-        {/* Content */}
         <div className="flex flex-col justify-between flex-grow p-4">
           <div className="flex justify-between items-center">
             <h3 className="text-2xl font-semibold text-gray-800 truncate">
@@ -63,7 +74,6 @@ const ProductCard = (product: Product) => {
             </h3>
           </div>
           <div className="my-2">
-
             <StarRating rating={product.rating} />
           </div>
           <p className="text-sm text-gray-600 line-clamp-2">
@@ -89,9 +99,9 @@ const ProductCard = (product: Product) => {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* ✅ Button is separate and only it does auth check */}
       <div className="p-4 pt-0">
-        <Button className="w-full" onClick={() => addToCart(product.id)}>
+        <Button className="w-full" onClick={handleAddToCart}>
           Add to Cart
         </Button>
       </div>
