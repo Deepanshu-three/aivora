@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     }
 
     for (const file of files) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 50 * 1024 * 1024) {
         return NextResponse.json({ error: "File too large" }, { status: 400 });
       }
     }

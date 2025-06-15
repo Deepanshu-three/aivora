@@ -201,3 +201,23 @@ model WishlistItem {
   productId String
   product   Product @relation(fields: [productId], references: [id])
 }
+
+
+model PrintJob {
+  id           String   @id @default(cuid())
+  fileUrl      String
+  units        String
+  rotationX    Float
+  rotationY    Float
+  rotationZ    Float
+  printerQuality String
+  material     String
+  infill       Int
+  quantity     Int
+  notes        String?
+  name         String
+  phone        String
+  email        String
+  address      String
+  createdAt    DateTime @default(now())
+}

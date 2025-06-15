@@ -25,17 +25,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-// import {
-//   Tooltip,
-//   TooltipContent,
-//   TooltipProvider,
-//   TooltipTrigger,
-// } from "@/components/ui/tooltip";
-// import { createClient } from "@supabase/supabase-js";
-import { useSession } from "@clerk/nextjs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Initialize Supabase client
+import { useSession } from "@clerk/nextjs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function CustomOrderForm() {
   const [file, setFile] = useState<File | null>(null);
@@ -57,25 +56,7 @@ export default function CustomOrderForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const { session } = useSession();
-  const createClerkSupabaseClient = () => {
-    // return createClient(
-    //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    //   process.env.NEXT_PUBLIC_SUPABASE_KEY!,
-    //   {
-    //     global: {
-    //       fetch: async (url: string, options = {}) => {
-    //         const clerkToken = await session?.getToken({
-    //           template: "supabase",
-    //         });
-    //         const headers = new Headers((options as RequestInit).headers);
-    //         headers.set("Authorization", `Bearer ${clerkToken}`);
-    //         return fetch(url, { ...options, headers });
-    //       },
-    //     },
-    //   }
-    // );
-  };
+  const createClerkSupabaseClient = () => {};
   const supabase = createClerkSupabaseClient();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -83,66 +64,73 @@ export default function CustomOrderForm() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    // event.preventDefault();
-    // setIsSubmitting(true);
-    // setSubmitStatus("idle");
 
-    // try {
-    //   if (!file) {
-    //     throw new Error("No file selected");
-    //   }
+const handleSubmit = async (event: React.FormEvent) => {
+  event.preventDefault();
 
-    //   // Upload file to Supabase Storage
-    //   const fileExt = file.name.split(".").pop();
-    //   const fileName = `${Date.now()}.${fileExt}`;
-    //   const { data: fileData, error: uploadError } = await supabase.storage
-    //     .from("3d-models")
-    //     .upload(fileName, file);
+  if (!file) {
+    toast.error("Please upload a file first");
+    return;
+  }
 
-    //   if (uploadError) {
-    //     throw uploadError;
-    //   }
+  try {
+    setIsSubmitting(true);
 
-    //   Get the public URL of the uploaded file
-    //   const {
-    //     data: { publicUrl },
-    //   } = supabase.storage.from("3d-models").getPublicUrl(fileName);
+    // 1. Upload file to Cloudinary (via single upload API)
+    const formData = new FormData();
+    formData.append("file", file);
 
-    //   Insert order data into Supabase table
-    //   const { data: orderData, error: insertError } = await supabase
-    //     .from("custom_orders")
-    //     .insert({
-    //       file_name: file.name,
-    //       file_url: publicUrl,
-    //       units,
-    //       rotation_x: rotation.x,
-    //       rotation_y: rotation.y,
-    //       rotation_z: rotation.z,
-    //       print_quality: printerQuality,
-    //       material,
-    //       infill,
-    //       quantity: parseInt(quantity),
-    //       notes,
-    //       name,
-    //       phone,
-    //       email,
-    //       address,
-    //       status: "submitted",
-    //     });
+    const uploadRes = await axios.post("/api/uploadcustom", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-    //   if (insertError) {
-    //     throw insertError;
-    //   }
+    const fileUrl = uploadRes.data.url;
 
-    //   setSubmitStatus("success");
-    // } catch (error) {
-    //   console.error("Error submitting order:", error);
-    //   setSubmitStatus("error");
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
-  };
+    // 2. Submit job to /api/printJob
+    const jobRes = await axios.post("/api/printJob", {
+      userName: name,
+      phone,
+      email,
+      address,
+      units,
+      rotation,
+      printerQuality,
+      material,
+      infill,
+      quantity,
+      notes,
+      fileUrl,
+    });
+
+    if (!jobRes.data.success) {
+      throw new Error(jobRes.data.error || "Failed to submit print job");
+    }
+
+    toast.success("Print job submitted successfully!");
+    setSubmitStatus("success");
+
+    // Clear form
+    setFile(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setAddress("");
+    setUnits("mm");
+    setRotation({ x: 0, y: 0, z: 0 });
+    setPrinterQuality("");
+    setMaterial("");
+    setInfill(20);
+    setQuantity("1");
+    setNotes("");
+  } catch (err: any) {
+    console.error("Submit error:", err);
+    toast.error(err.response?.data?.error || err.message || "Failed to submit");
+    setSubmitStatus("error");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
