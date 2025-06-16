@@ -1,6 +1,22 @@
 import db from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+  try {
+    const jobs = await db.printJob.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ success: true, jobs });
+  } catch (err) {
+    console.error("Error fetching print jobs:", err);
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch jobs" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

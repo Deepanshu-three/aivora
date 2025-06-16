@@ -7,6 +7,7 @@ import {
   Layers,
   Layers2Icon,
   MenuIcon,
+  Printer,
   ShieldCheckIcon,
 } from "lucide-react";
 import React, { useState } from "react";
@@ -36,6 +37,11 @@ const routes = [
     label: "Orders",
     icon: BoxesIcon,
   },
+  {
+    href: "/admin/printjob",
+    label: "Custom print job",
+    icon: Printer
+  }
 ];
 
 export default function Sidebar() {
