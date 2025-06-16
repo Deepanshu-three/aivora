@@ -1,24 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { addProductSchema } from "@/app/schema/addProductSchama";
-import axios from "axios";
+
 import { Modal } from "@/components/Modal";
-import { shippingAddressSchema } from "@/app/schema/addAddressSchema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -59,7 +45,7 @@ export default function ProceedToPayModel({ addressId }: AddProductModalProps) {
     <>
       <Button
         onClick={handleClick}
-        className="w-full py-6 text-lg bg-[#0C6170] hover:bg-[#09525c] text-white rounded-xl"
+        className="w-full py-6 text-lg text-white rounded-xl cursor-pointer"
       >
         Proceed to Pay
       </Button>
@@ -99,7 +85,7 @@ export default function ProceedToPayModel({ addressId }: AddProductModalProps) {
           <Button
             type="button"
             onClick={onPay}
-            className="w-full py-6 text-lg bg-[#0C6170] hover:bg-[#09525c] text-white rounded-xl"
+            className="w-full py-6 text-lg cursor-pointer text-white rounded-xl"
           >
             Place Order
           </Button>

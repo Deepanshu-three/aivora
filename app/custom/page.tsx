@@ -26,7 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 
-import { useSession } from "@clerk/nextjs";
 import {
   Tooltip,
   TooltipContent,
@@ -56,81 +55,80 @@ export default function CustomOrderForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const createClerkSupabaseClient = () => {};
-  const supabase = createClerkSupabaseClient();
+  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
     }
   };
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-const handleSubmit = async (event: React.FormEvent) => {
-  event.preventDefault();
-
-  if (!file) {
-    toast.error("Please upload a file first");
-    return;
-  }
-
-  try {
-    setIsSubmitting(true);
-
-    // 1. Upload file to Cloudinary (via single upload API)
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const uploadRes = await axios.post("/api/uploadcustom", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    const fileUrl = uploadRes.data.url;
-
-    // 2. Submit job to /api/printJob
-    const jobRes = await axios.post("/api/printJob", {
-      userName: name,
-      phone,
-      email,
-      address,
-      units,
-      rotation,
-      printerQuality,
-      material,
-      infill,
-      quantity,
-      notes,
-      fileUrl,
-    });
-
-    if (!jobRes.data.success) {
-      throw new Error(jobRes.data.error || "Failed to submit print job");
+    if (!file) {
+      toast.error("Please upload a file first");
+      return;
     }
 
-    toast.success("Print job submitted successfully!");
-    setSubmitStatus("success");
+    try {
+      setIsSubmitting(true);
 
-    // Clear form
-    setFile(null);
-    setName("");
-    setPhone("");
-    setEmail("");
-    setAddress("");
-    setUnits("mm");
-    setRotation({ x: 0, y: 0, z: 0 });
-    setPrinterQuality("");
-    setMaterial("");
-    setInfill(20);
-    setQuantity("1");
-    setNotes("");
-  } catch (err: any) {
-    console.error("Submit error:", err);
-    toast.error(err.response?.data?.error || err.message || "Failed to submit");
-    setSubmitStatus("error");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      // 1. Upload file to Cloudinary (via single upload API)
+      const formData = new FormData();
+      formData.append("file", file);
 
+      const uploadRes = await axios.post("/api/uploadcustom", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const fileUrl = uploadRes.data.url;
+
+      // 2. Submit job to /api/printJob
+      const jobRes = await axios.post("/api/printJob", {
+        userName: name,
+        phone,
+        email,
+        address,
+        units,
+        rotation,
+        printerQuality,
+        material,
+        infill,
+        quantity,
+        notes,
+        fileUrl,
+      });
+
+      if (!jobRes.data.success) {
+        throw new Error(jobRes.data.error || "Failed to submit print job");
+      }
+
+      toast.success("Print job submitted successfully!");
+      setSubmitStatus("success");
+
+      // Clear form
+      setFile(null);
+      setName("");
+      setPhone("");
+      setEmail("");
+      setAddress("");
+      setUnits("mm");
+      setRotation({ x: 0, y: 0, z: 0 });
+      setPrinterQuality("");
+      setMaterial("");
+      setInfill(20);
+      setQuantity("1");
+      setNotes("");
+    } catch (err: any) {
+      console.error("Submit error:", err);
+      toast.error(
+        err.response?.data?.error || err.message || "Failed to submit"
+      );
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
@@ -140,18 +138,32 @@ const handleSubmit = async (event: React.FormEvent) => {
 
       <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="upload">Upload Model</TabsTrigger>
-            <TabsTrigger value="settings" disabled={!file}>
+          <TabsList className="w-full overflow-x-auto flex flex-wrap sm:grid sm:grid-cols-4 gap-2 p-1 rounded-md bg-muted">
+            <TabsTrigger
+              className="flex-1 min-w-[140px] text-sm"
+              value="upload"
+            >
+              Upload Model
+            </TabsTrigger>
+
+            <TabsTrigger
+              className="flex-1 min-w-[140px] text-sm"
+              value="settings"
+              disabled={!file}
+            >
               Print Settings
             </TabsTrigger>
+
             <TabsTrigger
+              className="flex-1 min-w-[140px] text-sm"
               value="contact"
               disabled={!file || !material || !printerQuality}
             >
               Contact Details
             </TabsTrigger>
+
             <TabsTrigger
+              className="flex-1 min-w-[140px] text-sm"
               value="review"
               disabled={
                 !file || !material || !printerQuality || !name || !email

@@ -2,13 +2,11 @@
 
 import {
   BoxesIcon,
-  CoinsIcon,
   HomeIcon,
   Layers,
   Layers2Icon,
   MenuIcon,
   Printer,
-  ShieldCheckIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import Link from "next/link";

@@ -34,7 +34,7 @@ interface Product {
 }
 
 const ProductCard = (product: Product) => {
-  const { addToCart } = useCart();
+  const { addToCart, fetchCart} = useCart();
   const router = useRouter();
   const { isSignedIn } = useUser();
 
@@ -43,6 +43,7 @@ const ProductCard = (product: Product) => {
       router.push("/sign-in");
     } else {
       addToCart(product.id);
+      fetchCart()
     }
   };
 
@@ -101,7 +102,7 @@ const ProductCard = (product: Product) => {
 
       {/* ✅ Button is separate and only it does auth check */}
       <div className="p-4 pt-0">
-        <Button className="w-full" onClick={handleAddToCart}>
+        <Button className="w-full cursor-pointer" onClick={handleAddToCart}>
           Add to Cart
         </Button>
       </div>

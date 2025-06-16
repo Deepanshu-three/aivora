@@ -12,17 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
-  User,
   LogOut,
   Menu,
   X,
-  ShoppingCart,
-  BoxesIcon,
   ListOrderedIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { useUser, SignedOut, useClerk } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import ShoppingCartCom from "./cart";
 
 type navlinkType = {
@@ -59,7 +55,7 @@ const navlinks: navlinkType[] = [
 
 const Navbar = () => {
   const { signOut } = useClerk();
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isSignedIn, user } = useUser();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -102,7 +98,7 @@ const Navbar = () => {
         <div className="hidden lg:block">
           {!isSignedIn ? (
             <Link href={"/sign-in"}>
-              <Button className="bg-blue-500">Sign In</Button>
+              <Button className="bg-blue-500 cursor-pointer">Sign In</Button>
             </Link>
           ) : (
             <div className="flex items-center justify-center">
@@ -151,7 +147,7 @@ const Navbar = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-18 md:top-24 left-0 w-4/5 h-full bg-gray-100 text-blue-900 px-6 py-6 z-50 overflow-y-auto rounded-r-xl shadow-xl backdrop-blur-md"
+            className="fixed inset-y-0 left-0 w-4/5 bg-gray-100 text-blue-900 px-6 py-6 z-50 overflow-y-auto rounded-r-xl shadow-xl backdrop-blur-md"
           >
             {/* Profile Section */}
             {isSignedIn && (
@@ -163,7 +159,6 @@ const Navbar = () => {
                 />
                 <div>
                   <p className="font-bold text-xl">{user.fullName}</p>
-                  <p className="text-sm text-blue-600">{user.imageUrl}</p>
                 </div>
               </div>
             )}
@@ -190,7 +185,7 @@ const Navbar = () => {
                 {isSignedIn ? (
                   <>
                     <Link
-                      href="/myappointments"
+                      href="/myOrders"
                       className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
                         pathname === "/myappointments"
                           ? "text-blue-600 bg-blue-100"
@@ -198,7 +193,7 @@ const Navbar = () => {
                       }`}
                       onClick={() => setMenuOpen(false)}
                     >
-                      My appointments
+                      My Orders
                     </Link>
                     <button
                       className="flex items-center gap-3 mt-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-700 hover:text-white transition-all duration-200"
@@ -210,7 +205,7 @@ const Navbar = () => {
                 ) : (
                   <Link href="/sign-in">
                     <Button
-                      className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4"
+                      className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4 cursor-pointer"
                       onClick={() => setMenuOpen(false)}
                     >
                       Sign-In

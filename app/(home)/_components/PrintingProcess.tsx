@@ -30,41 +30,41 @@ const steps = [
 
 const PrintingProcess = () => {
   return (
-    <section className="py-20 bg-background w-full">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
+    <section className="py-16 bg-background w-full">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
           Our 3D Printing Process
         </h2>
 
-        <div className="flex flex-col lg:flex-row items-center justify-between ">
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
           {/* Left - Image */}
-          <div className="flex-1 flex justify-center lg:justify-center">
-            <div className="w-full max-w-sm">
-              <Image
-                src="/printing.jpg"
-                alt="3D Printing Process"
-                width={500}
-                height={600}
-                className="rounded-xl shadow-xl w-full h-auto object-cover"
-              />
-            </div>
+          <div className="w-full max-w-md mx-auto lg:mx-0">
+            <Image
+              src="/printing.jpg"
+              alt="3D Printing Process"
+              width={500}
+              height={600}
+              className="rounded-xl shadow-xl w-full h-auto object-cover"
+            />
           </div>
 
-          {/* Right - Process List */}
-          <div className="flex-1 space-y-8">
+          {/* Right - Steps */}
+          <div className="w-full space-y-6">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="flex items-start gap-4 group transition-transform duration-300"
+                className="flex items-start gap-4 group transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform">
+                <div className="min-w-10 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform">
                   {index + 1}
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground">
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground">
                     {step.title}
                   </h3>
-                  <p className="text-muted-foreground">{step.description}</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}

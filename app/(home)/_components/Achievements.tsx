@@ -198,12 +198,6 @@ export function AchievementShowcase() {
       <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl text-center mb-12">
         Our Achievements
       </h2>
-      {/* <img
-        aria-hidden="true"
-        src="/achievements-background.png"
-        alt=""
-        className="absolute select-none hidden xl:block -left-32 top-1/3"
-      /> */}
       <AchievementGrid />
     </div>
   );

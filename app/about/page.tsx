@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { ChevronDown, Printer, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MotionDiv, MotionImg } from "@/components/type/motion";

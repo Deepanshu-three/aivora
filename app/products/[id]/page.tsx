@@ -168,7 +168,7 @@ export default function ProductDetailPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
-                className="flex-1 text-base sm:text-lg py-5"
+                className="flex-1 text-base sm:text-lg py-5 cursor-pointer"
                 disabled={product!.stock === 0 || cartLoading}
                 onClick={() => addToCart(product!.id)}
               >

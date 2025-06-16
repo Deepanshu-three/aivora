@@ -11,7 +11,6 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ShoppingCartIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import axios from "axios";
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 
@@ -208,7 +207,8 @@ export default function Cart() {
                     <div className="mt-6">
                       <Link
                         href="/checkout"
-                        className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700"
+                        className="flex items-center justify-center rounded-md border border-transparent bg-black px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700"
+                          onClick={() => {setOpen(false)}}
                       >
                         Checkout
                       </Link>

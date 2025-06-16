@@ -2,26 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "../context/CartContext";
 import axios from "axios";
-import { useForm } from "react-hook-form";
-import { shippingAddressSchema } from "../schema/addAddressSchema";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import Script from "next/script";
-import { createOrder } from "../util/createOrder";
 import { useRouter } from "next/navigation";
 import AddAddressModal from "./_components/AddAddressModal";
 import ProceedToPayModal from "./_components/ProceedToPayModel";
@@ -44,9 +31,7 @@ const AddressPage = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -70,7 +55,6 @@ const AddressPage = () => {
   );
 
   const saveAddress = async () => {
-    setIsModalOpen(false);
     fetchAddresses();
     router.refresh();
   };

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher([
   "/", "/sign-in(.*)", "/sign-up(.*)", "/products(.*)", "/contact",
   "/faq", "/privacy", "/returns", "/terms", "/blogs", "/about",
-  "/api/products(.*)", "/api/cart", "/logo.png", "/api/category", "/printedpart.jpg"
+  "/api/products(.*)", "/api/cart", "/logo.png", "/api/category", "/printedpart.jpg",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);

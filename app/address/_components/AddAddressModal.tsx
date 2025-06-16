@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   Form,
   FormControl,
@@ -10,12 +10,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addProductSchema } from "@/app/schema/addProductSchama";
 import axios from "axios";
 import { Modal } from "@/components/Modal";
 import { shippingAddressSchema } from "@/app/schema/addAddressSchema";
@@ -51,6 +49,7 @@ export default function AddAddressModal({
       await axios.post("/api/address", data);
       toast.success("Address saved successfully!");
       onAddressAdded();
+      setIsModalOpen(false)
       form.reset();
     } catch (error) {
       console.error(error);

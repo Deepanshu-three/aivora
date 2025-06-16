@@ -28,9 +28,7 @@ const OrderDetailsPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [orderStatus, setOrderStatus] = useState("");
-  const [shippingStatus, setShippingStatus] = useState("");
   const [orderTrackingId, setOrderTrackingId] = useState("");
-  const [shippingTrackingId, setShippingTrackingId] = useState("");
 
   const fetchOrder = async () => {
     setLoading(true);
@@ -40,9 +38,7 @@ const OrderDetailsPage = () => {
       const data = await res.json();
       setOrder(data.order);
       setOrderStatus(data.order.status);
-      setShippingStatus(data.order.shipping?.status || "");
       setOrderTrackingId(data.order.trackingId || "");
-      setShippingTrackingId(data.order.shipping?.trackingId || "");
     } catch {
       toast.error("Error loading order");
     } finally {

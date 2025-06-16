@@ -22,20 +22,8 @@ const Newsfeed = () => {
         Follow us on social media for more discounts & promotions
       </p>
 
-      <span className="text-2xl font-bold text-blue-600 mb-8 block">@aviore_official</span>
+      <span className="text-2xl font-bold text-blue-600 mb-8 block">@aivora_00</span>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
-        {posts.map((src, idx) => (
-          <div key={idx} className="relative w-full aspect-square overflow-hidden rounded-lg shadow-md hover:shadow-xl cursor-pointer transition-shadow">
-            <img
-              src={src}
-              alt={`Instagram post ${idx + 1}`}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        ))}
-      </div>
     </section>
   );
 };

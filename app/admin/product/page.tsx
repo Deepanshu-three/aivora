@@ -34,7 +34,6 @@ type Product = {
 const Page = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const router = useRouter();
@@ -70,7 +69,6 @@ const Page = () => {
 
   const handleProductAdded = () => {
     fetchProducts();
-    setIsModalOpen(false);
     router.refresh();
   };
 
@@ -110,7 +108,7 @@ const Page = () => {
               {products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.name}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell>Rs. {product.price.toFixed(2)}</TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell>{product.category?.name || "-"}</TableCell>
                   <TableCell className="flex justify-center gap-2">
