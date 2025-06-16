@@ -1,15 +1,13 @@
-import db from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import db from "@/lib/prisma";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const addressId = params.id;
+  const addressId = context.params.id;
 
   try {
-    // Optional: Add user auth check here
-
     await db.shipping.delete({
       where: { id: addressId },
     });
