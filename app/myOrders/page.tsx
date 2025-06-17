@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import axios from "axios";
 
 interface Order {
   id: string;
@@ -27,19 +28,16 @@ const MyOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
-  const fetchOrders = async () => {
-    if (!user?.id) return;
-
-    try {
-      const res = await fetch(`/api/orders/user/${user.id}`);
-      const data = await res.json();
-      setOrders(data.orders);
-    } catch (error) {
-      console.error("Failed to fetch orders", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchOrders = async () => {
+  try {
+    const res = await axios.get("/api/orders/user");
+    setOrders(res.data.orders);
+  } catch (error) {
+    console.error("Failed to fetch orders", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchOrders();
