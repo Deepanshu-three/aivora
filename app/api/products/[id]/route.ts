@@ -1,64 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+// GET /api/products/[id]
+export async function GET(req: NextRequest, context: Context) {
+  const productId = context.params.id;
+
+  if (!productId) {
+    return NextResponse.json({ message: "No id provided" }, { status: 400 });
+  }
+
   try {
-    const resolvedParams = await params;
-    const productId = resolvedParams.id;
-
-    if (!productId) {
-      return NextResponse.json(
-        { message: "No id provided" },
-        { status: 400 }
-      );
-    }
-
     const res = await prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
+      where: { id: productId },
       include: {
-        category: {
-          select: {
-            name: true, // only get category name
-          },
-        },
-         images: {
-          select: {
-            url: true, // only get image URLs
-          },
-        },
+        category: { select: { name: true } },
+        images: { select: { url: true } },
       },
-      
     });
 
     if (!res) {
-      return NextResponse.json(
-        { message: "Product not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(res, { status: 200 });
-
+    return NextResponse.json(res);
   } catch (error) {
     console.error("GET /api/products/[id] error:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
-} 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+}
+
+// PUT /api/products/[id]
+export async function PUT(req: NextRequest, context: Context) {
+  const productId = context.params.id;
+
   try {
-    const resolvedParams = await params; // <-- await params here
-    const productId = resolvedParams.id;
-
     const body = await req.json();
-
     const {
       name,
       description,
@@ -71,7 +53,7 @@ export async function PUT(
       price,
       stock,
       productImages,
-      category, // category ID
+      category,
     } = body;
 
     if (!name || !price || !stock) {
@@ -95,58 +77,37 @@ export async function PUT(
         title,
         dimensions,
         images: {
-          create: productImages.map((url: string) => ({
-            url,
-          })),
+          create: productImages.map((url: string) => ({ url })),
         },
         categoryId: category,
       },
     });
 
-    return NextResponse.json({
-      message: "Product updated",
-      product: updatedProduct,
-    });
+    return NextResponse.json({ message: "Product updated", product: updatedProduct });
   } catch (error) {
     console.error("PUT /api/products/[id] error:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
 
-// DELETE a product by ID
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const resolvedParams = await params; // <-- await params here too
-    const productId = resolvedParams.id;
+// DELETE /api/products/[id]
+export async function DELETE(req: NextRequest, context: Context) {
+  const productId = context.params.id;
 
-    // Optional: Check if product exists before deletion
+  try {
     const existingProduct = await prisma.product.findUnique({
       where: { id: productId },
     });
 
     if (!existingProduct) {
-      return NextResponse.json(
-        { message: "Product not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    await prisma.product.delete({
-      where: { id: productId },
-    });
+    await prisma.product.delete({ where: { id: productId } });
 
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error("DELETE /api/products/[id] error:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
