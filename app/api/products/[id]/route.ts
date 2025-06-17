@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
+function extractIdFromUrl(req: NextRequest) {
+  const segments = req.nextUrl.pathname.split("/");
+  return segments[segments.length - 1]; // assumes ID is last segment
+}
 
 // GET /api/products/[id]
-export async function GET(req: NextRequest, context: Context) {
-  const productId = context.params.id;
+export async function GET(req: NextRequest) {
+  const productId = extractIdFromUrl(req);
 
   if (!productId) {
     return NextResponse.json({ message: "No id provided" }, { status: 400 });
@@ -36,8 +35,8 @@ export async function GET(req: NextRequest, context: Context) {
 }
 
 // PUT /api/products/[id]
-export async function PUT(req: NextRequest, context: Context) {
-  const productId = context.params.id;
+export async function PUT(req: NextRequest) {
+  const productId = extractIdFromUrl(req);
 
   try {
     const body = await req.json();
@@ -91,8 +90,8 @@ export async function PUT(req: NextRequest, context: Context) {
 }
 
 // DELETE /api/products/[id]
-export async function DELETE(req: NextRequest, context: Context) {
-  const productId = context.params.id;
+export async function DELETE(req: NextRequest) {
+  const productId = extractIdFromUrl(req);
 
   try {
     const existingProduct = await prisma.product.findUnique({

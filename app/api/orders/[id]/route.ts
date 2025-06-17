@@ -1,10 +1,18 @@
 import db from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request) {
   try {
+    const url = new URL(req.url);
+    const segments = url.pathname.split("/");
+    const id = segments[segments.length - 2]; // Assuming route is /api/orders/[id]/details
+
+    if (!id) {
+      return NextResponse.json({ error: "ID not provided" }, { status: 400 });
+    }
+
     const order = await db.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: { select: { name: true, email: true } },
         orderItems: {

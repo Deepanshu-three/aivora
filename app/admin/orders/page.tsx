@@ -1,81 +1,120 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/prisma";
+// File: app/admin/orders/page.tsx
+"use client";
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const id = searchParams.get("id");
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-  if (!id) {
-    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
-  }
+type Order = {
+  id: string;
+  status: string;
+  createdAt: string;
+  totalAmount: string
+  user: { name: string };
+  orderItems: {
+    quantity: number;
+    product: { name: string };
+  }[];
+};
 
-  try {
-    const order = await db.order.findUnique({
-      where: { id },
-      include: {
-        user: { select: { name: true, email: true } },
-        orderItems: {
-          include: {
-            product: {
-              select: {
-                name: true,
-                price: true,
-                images: { select: { url: true } },
-              },
-            },
-          },
-        },
-        payment: true,
-      },
-    });
+const PAGE_LIMIT = 10;
 
-    if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const fetchOrders = async (pageNumber: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/orders?page=${pageNumber}&limit=${PAGE_LIMIT}`);
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      const data = await res.json();
+      setOrders(data.orders);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load orders");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    let shipping = null;
+  useEffect(() => {
+    fetchOrders(page);
+  }, [page]);
 
-    if (order.shippingId) {
-      shipping = await db.shipping.findUnique({
-        where: { id: order.shippingId },
-        select: {
-          fullName: true,
-          mobileNumber: true,
-          pincode: true,
-          houseNo: true,
-          area: true,
-          city: true,
-          state: true,
-        },
-      });
-    }
+  return (
+    <div className="p-4 max-w-full overflow-x-auto">
+      <h1 className="text-2xl font-bold mb-4">Orders</h1>
+      <Table className="w-full min-w-[900px]">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Order ID</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center">Loading...</TableCell>
+            </TableRow>
+          ) : orders.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center">No orders found.</TableCell>
+            </TableRow>
+          ) : (
+            orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{order.id}</TableCell>
+                <TableCell>{order.user.name}</TableCell>
+                <TableCell>Rs. {order.totalAmount}</TableCell>
+                <TableCell>
+                  <span className={`rounded px-2 py-1 text-sm font-semibold ${
+                    order.status === "pending"
+                      ? "bg-yellow-200 text-yellow-800"
+                      : order.status === "delivered"
+                      ? "bg-green-200 text-green-800"
+                      : order.status === "shipped"
+                      ? "bg-blue-200 text-blue-800"
+                      : "bg-gray-200 text-gray-800"
+                  }`}>
+                    {order.status}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="secondary"
+                    onClick={() => router.push(`/admin/orders/${order.id}`)}
+                  >
+                    Open
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
 
-    return NextResponse.json({
-      order: {
-        id: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        totalAmount: order.totalAmount,
-        trackingId: order.trackingId ?? null,
-        user: order.user,
-        paymentStatus: order.payment?.paymentStatus ?? "pending",
-        orderItems: order.orderItems.map((item) => ({
-          quantity: item.quantity,
-          price: item.price,
-          product: {
-            name: item.product.name,
-            price: item.product.price,
-            images: item.product.images,
-          },
-        })),
-        shipping,
-      },
-    });
-  } catch (error) {
-    console.error("[ORDER_DETAILS_ERROR]", error);
-    return NextResponse.json(
-      { error: "Something went wrong while fetching the order" },
-      { status: 500 }
-    );
-  }
+      <div className="flex justify-center items-center mt-4 space-x-4">
+        <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Previous</Button>
+        <span>Page <strong>{page}</strong> of <strong>{totalPages}</strong></span>
+        <Button variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Next</Button>
+      </div>
+    </div>
+  );
 }

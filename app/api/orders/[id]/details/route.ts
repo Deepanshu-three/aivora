@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 
-export async function GET(req: NextRequest, context: any) {
-  const { id } = context.params;
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").findLast((segment) => segment) || "";
 
   if (!id) {
     return NextResponse.json({ error: "ID not provided" }, { status: 400 });
