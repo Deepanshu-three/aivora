@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 
 export async function DELETE(
-  req: Request,
-  context: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const addressId = context.params.id;
+  const addressId = params.id;
 
   try {
     await db.shipping.delete({
