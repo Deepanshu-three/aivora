@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, context: any) {
   const { id } = context.params;
+
+  if (!id) {
+    return NextResponse.json({ error: "ID not provided" }, { status: 400 });
+  }
 
   try {
     const order = await db.order.findUnique({
@@ -32,7 +33,6 @@ export async function GET(
     }
 
     let shipping = null;
-
     if (order.shippingId) {
       shipping = await db.shipping.findUnique({
         where: { id: order.shippingId },
