@@ -60,15 +60,18 @@ const AddressPage = () => {
   };
 
   const handleDeleteAddress = async (id: string) => {
-    try {
-      await axios.delete(`/api/address/${id}`);
-      toast.success("Address deleted successfully");
-      fetchAddresses();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete address");
-    }
-  };
+  try {
+    await axios.delete(`/api/address`, {
+      data: { id }, // ✅ body for DELETE request
+    });
+    toast.success("Address deleted successfully");
+    fetchAddresses();
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to delete address");
+  }
+};
+
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-7xl mx-auto min-h-screen">
