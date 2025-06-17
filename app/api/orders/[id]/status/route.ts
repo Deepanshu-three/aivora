@@ -1,10 +1,21 @@
-// app/api/orders/[id]/status/route.ts
 import db from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+// Utility to extract the order ID from the URL
+function extractOrderId(req: NextRequest) {
+  const segments = req.nextUrl.pathname.split("/");
+  // Assumes the path is like /api/orders/:id/status → we want the 3rd segment from the end
+  return segments[segments.length - 2];
+}
+
+export async function PUT(req: NextRequest) {
   try {
+    const id = extractOrderId(req);
     const { status, trackingId } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Order ID not found in URL" }, { status: 400 });
+    }
 
     if (!["pending", "shipped", "delivered", "canceled"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
@@ -15,7 +26,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const updatedOrder = await db.order.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status,
         trackingId: trackingId || null,
