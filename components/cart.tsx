@@ -116,7 +116,6 @@ export default function Cart() {
                           {cartItems.map(
                             (
                               productItem: CartItemWithProduct,
-                              index: number
                             ) => (
                               <li key={productItem.id} className="flex py-6">
                                 <div className="w-24 h-24 shrink-0 overflow-hidden rounded-md border border-gray-200">

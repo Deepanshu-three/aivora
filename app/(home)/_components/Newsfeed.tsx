@@ -1,12 +1,5 @@
 import React from 'react';
 
-const posts = [
-  '/posts/post1.jpg',
-  '/posts/post2.jpg',
-  '/posts/post3.jpg',
-  '/posts/post4.jpg',
-];
-
 const Newsfeed = () => {
   return (
     <section className="text-center my-10 px-4 max-w-7xl mx-auto">

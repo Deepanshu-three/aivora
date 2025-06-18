@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
@@ -46,7 +46,7 @@ const fetchOrders = async () => {
   if (loading) return <Skeleton className="h-48 w-full rounded-xl" />;
 
   if (orders.length === 0)
-    return <p className="text-center text-gray-500 mt-20">You haven't placed any orders yet.</p>;
+    return <p className="text-center text-gray-500 mt-20">You haven&apos;t placed any orders yet.</p>;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-6 min-h-screen">

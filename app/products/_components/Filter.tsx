@@ -1,10 +1,5 @@
 "use client";
 import {
-  CoinsIcon,
-  HomeIcon,
-  Layers2Icon,
-  MenuIcon,
-  ShieldCheckIcon,
   FilterIcon,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";

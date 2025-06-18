@@ -10,7 +10,7 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    let userWithCart = await db.user.findUnique({
+    const userWithCart = await db.user.findUnique({
       where: { id: user.id },
       include: {
         cart: {
@@ -88,11 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ Safe parsing of optional body
-    let quantity = 1;
-    try {
-      const body = await req.json();
-      quantity = body.quantity || 1;
-    } catch (_) {}
+    const quantity = body.quantity || 1;
 
     let cart = await db.cart.findUnique({
       where: { userId: dbUser.id },
@@ -129,7 +125,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   try {
     const user = await currentUser();
     if (!user)
@@ -169,7 +165,7 @@ export async function PATCH(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const user = await currentUser();
     if (!user) {

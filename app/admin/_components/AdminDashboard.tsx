@@ -1,5 +1,4 @@
-// import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-// import { cookies } from "next/headers";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Helper function to format price in rupees

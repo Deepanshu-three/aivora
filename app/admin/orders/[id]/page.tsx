@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Card,
@@ -30,25 +30,25 @@ const OrderDetailsPage = () => {
   const [orderStatus, setOrderStatus] = useState("");
   const [orderTrackingId, setOrderTrackingId] = useState("");
 
-  const fetchOrder = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/orders/${id}`);
-      if (!res.ok) throw new Error("Failed to fetch order");
-      const data = await res.json();
-      setOrder(data.order);
-      setOrderStatus(data.order.status);
-      setOrderTrackingId(data.order.trackingId || "");
-    } catch {
-      toast.error("Error loading order");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchOrder = useCallback(async () => {
+  setLoading(true);
+  try {
+    const res = await fetch(`/api/orders/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch order");
+    const data = await res.json();
+    setOrder(data.order);
+    setOrderStatus(data.order.status);
+    setOrderTrackingId(data.order.trackingId || "");
+  } catch {
+    toast.error("Error loading order");
+  } finally {
+    setLoading(false);
+  }
+}, [id]);
 
   useEffect(() => {
-    if (id) fetchOrder();
-  }, [id]);
+    if (id) {fetchOrder();}
+  }, [id, fetchOrder]);
 
   const handleUpdateOrderStatus = async () => {
   try {
@@ -61,6 +61,7 @@ const OrderDetailsPage = () => {
     fetchOrder();
   } catch (error) {
     toast.error("Failed to update order status");
+    console.log(error)
   }
 };
 

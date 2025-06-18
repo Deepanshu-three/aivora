@@ -1,40 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "../context/CartContext";
-import axios from "axios";
-import { useForm } from "react-hook-form";
-import { shippingAddressSchema } from "../schema/addAddressSchema";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+
 import Script from "next/script";
-import { createOrder } from "../util/createOrder";
 import { useRouter } from "next/navigation";
 
-type address = {
-  id: string;
-  fullName: string;
-  mobileNumber: string;
-  pincode: string;
-  houseNo: string;
-  area: string;
-  city: string;
-  state: string;
-  userId: string;
-};
+
 
 const CheckoutPage = () => {
   const { cartItems } = useCart();

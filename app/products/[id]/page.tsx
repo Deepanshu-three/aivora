@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Star,
-  Truck,
-  IndianRupee,
   MessageCircleQuestion,
   RefreshCcw,
   TruckIcon,
@@ -14,8 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SimilarProducts from "./_components/SimilarProducts";
-import axios from "axios";
-import { toast } from "sonner";
 import { useCart } from "@/app/context/CartContext";
 import ImageCarousel from "@/components/ImageCarousel";
 
@@ -66,18 +62,21 @@ export default function ProductDetailPage() {
   const [cartLoading, setCartLoading] = useState(false);
   const { addToCart } = useCart();
 
-  const fetchProduct = async () => {
-    try {
-      const res = await fetch(`/api/products/${id}`);
-      if (!res.ok) throw new Error("Failed to fetch product");
-      const data = await res.json();
-      setProduct(data);
-    } catch (err) {
-      setProduct(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchProduct = useCallback(async () => {
+  try {
+    setCartLoading(true)
+    const res = await fetch(`/api/products/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch product");
+    const data = await res.json();
+    setProduct(data);
+  } catch (err) {
+    console.error("Failed to fetch product:", err);
+    setProduct(null);
+  } finally {
+    setLoading(false);
+    setCartLoading(false)
+  }
+}, [id]);
 
   useEffect(() => {
     fetchProduct();

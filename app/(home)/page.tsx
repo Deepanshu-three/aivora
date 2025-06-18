@@ -1,7 +1,6 @@
 import React from 'react'
 import Hero from './_components/Hero'
 import NewArrival from './_components/NewArrival'
-import { Separator } from "@/components/ui/separator"
 import Collection from './_components/Collection'
 import BestSeller from './_components/BestSellers'
 import Services from './_components/Services'

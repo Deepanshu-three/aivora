@@ -53,8 +53,8 @@ export default function FAQPage() {
               <AccordionContent>
                 Once your order has been shipped, you will receive a
                 confirmation email with a tracking number. You can use this
-                number on our website or the carrier's website to track your
-                package's progress.
+                number on our website or the carrier&apos;s website to track your
+                package&apos;s progress.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-5">
@@ -62,11 +62,11 @@ export default function FAQPage() {
                 Do you offer warranty on your products?
               </AccordionTrigger>
               <AccordionContent>
-                Most of our products come with a manufacturer's warranty. The
+                Most of our products come with a manufacturer&apos;s warranty. The
                 duration and coverage of the warranty vary by product and brand.
                 We also offer extended warranty options for many items at an
                 additional cost. You can find warranty information on each
-                product's page.
+                product&apos;s page.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-6">
@@ -85,7 +85,7 @@ export default function FAQPage() {
               <AccordionContent>
                 Yes, we offer price matching on identical items sold by major
                 retailers. The item must be in stock both at our store and the
-                competitor's. Price matching requests must be made at the time
+                competitor&apos;s. Price matching requests must be made at the time
                 of purchase. Please contact our customer service with the
                 details of the lower-priced item.
               </AccordionContent>

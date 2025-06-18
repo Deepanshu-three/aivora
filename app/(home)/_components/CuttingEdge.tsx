@@ -5,11 +5,12 @@ import {motion} from "framer-motion"
 import { Card, CardContent } from '@/components/ui/card'
 
 const CuttingEdge = () => {
-      const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   return (
      <section className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">

@@ -67,9 +67,9 @@ export default function ImprovedRefundPage() {
                   Ship the product back in its original packaging with all
                   accessories.
                 </li>
-                <li>Once received, we'll inspect the returned item.</li>
+                <li>Once received, we&apos;ll inspect the returned item.</li>
                 <li>
-                  If everything is in order, we'll process your refund or
+                  If everything is in order, we&apos;ll process your refund or
                   replacement.
                 </li>
                 <li>
@@ -100,7 +100,7 @@ export default function ImprovedRefundPage() {
                 </li>
                 <li>
                   Orders can only be changed or cancelled if they are in
-                  "Pending" or "Payment Verification" status.
+                  &quot;Pending&quot; or &quot;Payment Verification&quot; status.
                 </li>
               </ul>
             </TabsContent>

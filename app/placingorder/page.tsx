@@ -6,7 +6,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
-import { createOrder } from "../util/createOrder";
 import Script from "next/script";
 
 
@@ -45,6 +44,7 @@ export default function PlacingOrderPage() {
         } catch (error) {
           toast.error("Something went wrong.");
           router.push("/");
+          console.log(error)
         }
       } else if (mode === "razorpay") {
         try {
