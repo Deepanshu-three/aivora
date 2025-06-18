@@ -141,11 +141,11 @@ export default function ProductsList({ filters }: ProductFilterProps) {
                 id={product.id}
                 key={product.id}
                 name={product.name}
-                description={product.title!}
+                description={product.title ?? ""}
                 image={product.images?.[0]?.url ?? ""}
                 price={product.price.toString()}
-                category={product.category?.name!}
-                material={product.material!}
+                category={product.category?.name ?? ""}
+                material={product.material ?? ""}
                 rating={4}
               />
             ))
