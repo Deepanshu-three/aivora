@@ -16,8 +16,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { addCategorySchema } from "@/app/schema/addCategorySchema";
 import { toast } from "sonner";
+
+// Schema for category and subcategory
+const addCategorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
+
+const addSubcategorySchema = z.object({
+  name: z.string().min(1, "Subcategory name is required"),
+  categoryId: z.string().min(1, "Select a parent category"),
+});
 
 type Category = {
   id: string;
@@ -27,7 +37,8 @@ type Category = {
 
 export default function AddCategory() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const form = useForm<z.infer<typeof addCategorySchema>>({
+
+  const categoryForm = useForm<z.infer<typeof addCategorySchema>>({
     resolver: zodResolver(addCategorySchema),
     defaultValues: {
       name: "",
@@ -35,14 +46,20 @@ export default function AddCategory() {
     },
   });
 
-  // Fetch categories from API
+  const subcategoryForm = useForm<z.infer<typeof addSubcategorySchema>>({
+    resolver: zodResolver(addSubcategorySchema),
+    defaultValues: {
+      name: "",
+      categoryId: "",
+    },
+  });
+
   const fetchCategories = async () => {
     try {
       const res = await axios.get("/api/category");
       setCategories(res.data);
     } catch (error) {
       toast.error("Failed to fetch categories");
-      console.error("Fetch categories error:", error);
     }
   };
 
@@ -50,36 +67,44 @@ export default function AddCategory() {
     fetchCategories();
   }, []);
 
-  const onSubmit = async () => {
-    const data = form.getValues();
-
+  const onCategorySubmit = async () => {
+    const data = categoryForm.getValues();
     try {
-      const categoryPayload = {
-        name: data.name,
-        description: data.description || "",
-      };
-
-      const res = await axios.post("/api/category", categoryPayload);
-      toast.success(res.data.message || "Category saved successfully");
-      form.reset();
-      // Refresh the category list
+      const res = await axios.post("/api/category", data);
+      toast.success(res.data.message || "Category created successfully");
+      categoryForm.reset();
       fetchCategories();
-    } catch (error) {
+    } catch (err) {
       toast.error("Error creating category");
-      console.error("Error uploading category", error);
+    }
+  };
+
+  const onSubcategorySubmit = async () => {
+    const data = subcategoryForm.getValues();
+    try {
+      const res = await axios.post("/api/subcategory", data);
+      toast.success("Subcategory added successfully");
+      subcategoryForm.reset();
+      fetchCategories();
+    } catch (err) {
+      toast.error("Error creating subcategory");
     }
   };
 
   return (
-    <div className="w-full mx-auto mt-10 max-w-2xl bg-white p-8 md:p-12 border border-[#0C6170] shadow-xl rounded-xl space-y-8 flex flex-col">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+    <div className="w-full mx-auto mt-10 max-w-2xl bg-white p-8 md:p-12 border border-[#0C6170] shadow-xl rounded-xl space-y-10 flex flex-col">
+      {/* Category Form */}
+      <Form {...categoryForm}>
+        <form
+          onSubmit={categoryForm.handleSubmit(onCategorySubmit)}
+          className="space-y-6 w-full"
+        >
           <h2 className="text-2xl font-semibold text-center text-[#0C6170]">
             Add New Category
           </h2>
 
           <FormField
-            control={form.control}
+            control={categoryForm.control}
             name="name"
             render={({ field }) => (
               <FormItem>
@@ -93,13 +118,16 @@ export default function AddCategory() {
           />
 
           <FormField
-            control={form.control}
+            control={categoryForm.control}
             name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Category Description (optional)" {...field} />
+                  <Textarea
+                    placeholder="Category Description (optional)"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -112,9 +140,65 @@ export default function AddCategory() {
         </form>
       </Form>
 
+      {/* Subcategory Form */}
+      <Form {...subcategoryForm}>
+        <form
+          onSubmit={subcategoryForm.handleSubmit(onSubcategorySubmit)}
+          className="space-y-6 w-full"
+        >
+          <h2 className="text-2xl font-semibold text-center text-[#0C6170]">
+            Add Subcategory
+          </h2>
+
+          <FormField
+            control={subcategoryForm.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subcategory Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Subcategory Name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={subcategoryForm.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Parent Category</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="w-full p-2 border rounded bg-white"
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full">
+            Add Subcategory
+          </Button>
+        </form>
+      </Form>
+
       {/* Existing categories list */}
       <div>
-        <h3 className="text-xl font-semibold text-[#0C6170] mb-4">Existing Categories</h3>
+        <h3 className="text-xl font-semibold text-[#0C6170] mb-4">
+          Existing Categories
+        </h3>
         {categories.length === 0 ? (
           <p className="text-gray-500">No categories found.</p>
         ) : (
@@ -127,7 +211,9 @@ export default function AddCategory() {
               >
                 <strong>{category.name}</strong>
                 {category.description && (
-                  <p className="text-gray-600 text-sm mt-1">{category.description}</p>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {category.description}
+                  </p>
                 )}
               </li>
             ))}
