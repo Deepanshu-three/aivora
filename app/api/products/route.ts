@@ -2,7 +2,6 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 // /api/products/route.ts
-
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -21,9 +20,11 @@ export async function POST(req: NextRequest) {
       dimensions,
       price,
       stock,
+      material,
       addInfo,
-      category,
-      productImages, // Now expecting an array of image URLs
+      category, // categoryId
+      subCategory, // subCategoryId ✅
+      productImages, // array of image URLs
     } = await req.json();
 
     // Basic validation
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create product with related images
+    // Create product
     const product = await db.product.create({
       data: {
         name,
@@ -52,9 +53,11 @@ export async function POST(req: NextRequest) {
         weight,
         manufacture,
         price,
+        material,
         stock,
         addInfo,
         categoryId: category,
+        subCategoryId: subCategory || null, // ✅ handle optional subcategory
         images: {
           create: productImages.map((url: string) => ({
             url,
@@ -78,23 +81,40 @@ export async function POST(req: NextRequest) {
   }
 }
 
+
 export async function GET() {
   try {
     const products = await db.product.findMany({
       include: {
         category: {
           select: {
+            id: true,
+            name: true,
+          },
+        },
+        subCategory: {
+          select: {
+            id: true,
             name: true,
           },
         },
         images: {
           select: {
-            url: true, // only get image URLs
+            url: true,
           },
         },
       },
     });
 
+    if (!products || products.length === 0) {
+      return NextResponse.json(
+        {
+          message: "No products found",
+          products: [],
+        },
+        { status: 200 }
+      );
+    }
 
     return NextResponse.json({ products }, { status: 200 });
   } catch (error) {
@@ -105,3 +125,4 @@ export async function GET() {
     );
   }
 }
+

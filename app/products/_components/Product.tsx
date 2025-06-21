@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import axios from "axios";
 
 const PRODUCTS_PER_PAGE = 9;
+
 type Product = {
   id: string;
   name: string;
@@ -28,6 +29,11 @@ type Product = {
     name: string;
   };
 
+  subCategory?: {
+    id: string;
+    name: string;
+  };
+
   images: {
     id: string;
     url: string;
@@ -37,6 +43,7 @@ type Product = {
 interface ProductFilterProps {
   filters: {
     category: string;
+    subcategory: string;
     priceMin: number;
     priceMax: number;
   };
@@ -60,7 +67,6 @@ export default function ProductsList({ filters }: ProductFilterProps) {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch products once
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -74,16 +80,24 @@ export default function ProductsList({ filters }: ProductFilterProps) {
     }
   };
 
-  // Filter products based on search + filters
   useEffect(() => {
     let filtered = allProducts;
 
+    // Apply category filter (using category ID)
     if (filters.category) {
       filtered = filtered.filter(
-        (product) => product.category?.name === filters.category
+        (product) => product.category?.id === filters.category
       );
     }
 
+    // Apply subcategory filter (optional)
+    if (filters.subcategory) {
+      filtered = filtered.filter(
+        (product) => product.subCategory?.id === filters.subcategory
+      );
+    }
+
+    // Apply price and search filters
     filtered = filtered.filter(
       (product) =>
         product.price >= filters.priceMin &&
@@ -95,7 +109,6 @@ export default function ProductsList({ filters }: ProductFilterProps) {
     setCurrentPage(1);
   }, [filters, searchQuery, allProducts]);
 
-  // Initial fetch
   useEffect(() => {
     fetchProducts();
   }, []);

@@ -39,6 +39,7 @@ export default function AddProductModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subcategories, setSubcategories] = useState<Category[]>([]); // or a specific SubCategory type
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
 
   const form = useForm<z.infer<typeof addProductSchema>>({
     resolver: zodResolver(addProductSchema),
@@ -104,7 +105,7 @@ export default function AddProductModal({
         stock: data.stock,
         productImages: uploadedImageUrls,
         category: data.category,
-        subcategory: data.subcategory || null, // ✅ Include this
+        subCategory: selectedSubCategory || "", // ✅ Include this
         brand: data.brand,
         manufacture: data.manufacture,
         title: data.title,
@@ -125,6 +126,24 @@ export default function AddProductModal({
       setIsSubmitting(false);
     }
   };
+
+  const handleCategoryChange = async (
+  e: React.ChangeEvent<HTMLSelectElement>,
+  onChange: (value: string) => void
+) => {
+  const selected = e.target.value;
+  onChange(selected);
+  setSelectedCategory(selected);
+
+  try {
+    const res = await axios.get(`/api/subcategory?categoryId=${selected}`);
+    setSubcategories(res.data.subcategories || []);
+  } catch (err) {
+    console.error("Failed to fetch subcategories", err);
+    setSubcategories([]);
+  }
+};
+
 
   return (
     <>
@@ -333,70 +352,62 @@ export default function AddProductModal({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      className="w-full border border-gray-300 rounded px-3 py-2"
-                      onChange={async (e) => {
-                        const selected = e.target.value;
-                        field.onChange(selected);
-                        setSelectedCategory(selected);
+           <FormField
+  control={form.control}
+  name="category"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Category</FormLabel>
+      <FormControl>
+        <select
+          {...field}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          onChange={(e) => handleCategoryChange(e, field.onChange)} // ✅ Clean
+        >
+          <option value="" disabled>
+            Select a category
+          </option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
-                        try {
-                          const res = await axios.get(
-                            `/api/subcategory?categoryId=${selected}`
-                          );
-                          setSubcategories(res.data.subcategories || res.data);
-                        } catch (err) {
-                          console.error("Failed to fetch subcategories", err);
-                          setSubcategories([]); // fallback
-                        }
-                      }}
-                    >
-                      <option value="" disabled>
-                        Select a category
-                      </option>
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
-              control={form.control}
-              name="subcategory"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Subcategory</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      className="w-full border border-gray-300 rounded px-3 py-2"
-                      disabled={!selectedCategory || subcategories.length === 0}
-                    >
-                      <option value="">Select a subcategory</option>
-                      {subcategories.map((subcat) => (
-                        <option key={subcat.id} value={subcat.id}>
-                          {subcat.name}
-                        </option>
-                      ))}
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+  control={form.control}
+  name="subcategory"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Subcategory</FormLabel>
+      <FormControl>
+        <select
+          {...field}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          disabled={!selectedCategory || subcategories.length === 0}
+          onChange={(e) => {
+            field.onChange(e.target.value); // update form state
+            setSelectedSubCategory(e.target.value); // update local state if needed
+          }}
+        >
+          <option value="">Select a subcategory</option>
+          {subcategories.map((subcat) => (
+            <option key={subcat.id} value={subcat.id}>
+              {subcat.name}
+            </option>
+          ))}
+        </select>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Adding..." : "Add Product"}
