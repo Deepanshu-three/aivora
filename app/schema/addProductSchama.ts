@@ -50,5 +50,7 @@ export const addProductSchema = z.object({
     .string()
     .min(1, { message: "Name must be at least 2 characters long." })
     .max(100, { message: "Name must be no more than 100 characters long." }),
-  material: z.string()
+  material: z.string(),
+  subcategory: z.string().optional(), // ✅ Add this
+
 });

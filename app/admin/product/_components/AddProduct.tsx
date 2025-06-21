@@ -37,6 +37,8 @@ export default function AddProductModal({
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [subcategories, setSubcategories] = useState<Category[]>([]); // or a specific SubCategory type
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const form = useForm<z.infer<typeof addProductSchema>>({
     resolver: zodResolver(addProductSchema),
@@ -53,7 +55,7 @@ export default function AddProductModal({
       stock: 0,
       productImages: [],
       category: "",
-      material: ""
+      material: "",
     },
   });
 
@@ -71,59 +73,58 @@ export default function AddProductModal({
   }, []);
 
   const onSubmit = async () => {
-  setIsSubmitting(true);
-  const data = form.getValues();
+    setIsSubmitting(true);
+    const data = form.getValues();
 
-  try {
-    let uploadedImageUrls: string[] = [];
+    try {
+      let uploadedImageUrls: string[] = [];
 
-    if (data.productImages && data.productImages.length > 0) {
-      const imageFormData = new FormData();
+      if (data.productImages && data.productImages.length > 0) {
+        const imageFormData = new FormData();
 
-      data.productImages.forEach((file: File) => {
-        imageFormData.append("files", file); // name must match backend field
-      });
+        data.productImages.forEach((file: File) => {
+          imageFormData.append("files", file); // name must match backend field
+        });
 
-      const imageUploadRes = await axios.post("/api/upload", imageFormData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+        const imageUploadRes = await axios.post("/api/upload", imageFormData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-      // Assuming your backend returns an array of image URLs
-      uploadedImageUrls = imageUploadRes.data.imageUrls;
+        // Assuming your backend returns an array of image URLs
+        uploadedImageUrls = imageUploadRes.data.imageUrls;
+      }
+
+      const productPayload = {
+        name: data.name,
+        description: data.description || "",
+        addInfo: data.addInfo || "",
+        price: data.price,
+        stock: data.stock,
+        productImages: uploadedImageUrls,
+        category: data.category,
+        subcategory: data.subcategory || null, // ✅ Include this
+        brand: data.brand,
+        manufacture: data.manufacture,
+        title: data.title,
+        dimensions: data.dimensions,
+        weight: data.weight,
+        material: data.material,
+      };
+
+      await axios.post("/api/products", productPayload);
+
+      form.reset();
+      onProductAdded();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error uploading product", error);
+      // toast.error("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const productPayload = {
-      name: data.name,
-      description: data.description || "",
-      addInfo: data.addInfo || "",
-      price: data.price,
-      stock: data.stock,
-      productImages: uploadedImageUrls, // ⬅️ send array now
-      category: data.category,
-      brand: data.brand,
-      manufacture: data.manufacture,
-      title: data.title,
-      dimensions: data.dimensions,
-      weight: data.weight,
-      material: data.material
-
-    };
-
-    await axios.post("/api/products", productPayload);
-
-    form.reset();
-    onProductAdded()
-    setIsModalOpen(false);
-  } catch (error) {
-    console.error("Error uploading product", error);
-    // toast.error("Something went wrong");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+  };
 
   return (
     <>
@@ -342,6 +343,21 @@ export default function AddProductModal({
                     <select
                       {...field}
                       className="w-full border border-gray-300 rounded px-3 py-2"
+                      onChange={async (e) => {
+                        const selected = e.target.value;
+                        field.onChange(selected);
+                        setSelectedCategory(selected);
+
+                        try {
+                          const res = await axios.get(
+                            `/api/subcategory?categoryId=${selected}`
+                          );
+                          setSubcategories(res.data.subcategories || res.data);
+                        } catch (err) {
+                          console.error("Failed to fetch subcategories", err);
+                          setSubcategories([]); // fallback
+                        }
+                      }}
                     >
                       <option value="" disabled>
                         Select a category
@@ -349,6 +365,30 @@ export default function AddProductModal({
                       {categories.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="subcategory"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subcategory</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      disabled={!selectedCategory || subcategories.length === 0}
+                    >
+                      <option value="">Select a subcategory</option>
+                      {subcategories.map((subcat) => (
+                        <option key={subcat.id} value={subcat.id}>
+                          {subcat.name}
                         </option>
                       ))}
                     </select>
