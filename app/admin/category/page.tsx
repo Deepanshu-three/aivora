@@ -58,7 +58,7 @@ export default function AddCategory() {
     try {
       const res = await axios.get("/api/category");
       setCategories(res.data);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch categories");
     }
   };
@@ -70,11 +70,11 @@ export default function AddCategory() {
   const onCategorySubmit = async () => {
     const data = categoryForm.getValues();
     try {
-      const res = await axios.post("/api/category", data);
-      toast.success(res.data.message || "Category created successfully");
+      await axios.post("/api/category", data);
+      toast.success("Category created successfully");
       categoryForm.reset();
       fetchCategories();
-    } catch (err) {
+    } catch {
       toast.error("Error creating category");
     }
   };
@@ -82,11 +82,11 @@ export default function AddCategory() {
   const onSubcategorySubmit = async () => {
     const data = subcategoryForm.getValues();
     try {
-      const res = await axios.post("/api/subcategory", data);
+      await axios.post("/api/subcategory", data);
       toast.success("Subcategory added successfully");
       subcategoryForm.reset();
       fetchCategories();
-    } catch (err) {
+    } catch {
       toast.error("Error creating subcategory");
     }
   };
