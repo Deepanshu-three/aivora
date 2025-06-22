@@ -1,6 +1,6 @@
 // app/api/subcategory/route.ts
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -42,5 +42,23 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("[SUBCATEGORY_GET]", error);
     return NextResponse.json({ message: "Error fetching subcategories" }, { status: 500 });
+  }
+}
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id } = await req.json();
+
+    await db.subCategory.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Subcategory deleted" });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to delete subcategory", error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }

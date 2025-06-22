@@ -1,56 +1,31 @@
 import { z } from "zod";
 
 export const addProductSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(100, { message: "Name must be no more than 100 characters long." }),
+  name: z.string().min(2).max(100),
 
-  description: z
-    .string()
-    .min(1, { message: "Description must be greater than 1 character." })
-    .optional(),
-
+  title: z.string().max(1000).optional(),
+  description: z.string().optional(),
   addInfo: z.string().optional(),
 
-  price: z
-    .number({ invalid_type_error: "Price must be a number" })
-    .min(0, { message: "Price cannot be negative" }),
+  brand: z.string().max(100).optional(),
+  dimensions: z.string().max(100).optional(),
+  weight: z.string().max(100).optional(),
+  manufacture: z.string().max(100).optional(),
+  material: z.string().optional(),
 
-  stock: z
-    .number({ invalid_type_error: "Stock must be a number" })
-    .min(0, { message: "Stock cannot be negative" }),
+  price: z.number({ invalid_type_error: "Price must be a number" }).min(0),
+  stock: z.number({ invalid_type_error: "Stock must be a number" }).min(0),
 
-   productImages: z
-    .any()
-    .refine(
-      (files) => Array.isArray(files) && files.length > 0 && files.every((file) => file instanceof File),
-      {
-        message: "At least one valid product image is required.",
-      }
-    ),
-  category: z.string(),
-  title: z
-    .string()
-    .min(1, { message: "Name must be at least 2 characters long." })
-    .max(1000, { message: "Name must be no more than 100 characters long." }),
-  brand: z
-    .string()
-    .min(1, { message: "Name must be at least 2 characters long." })
-    .max(100, { message: "Name must be no more than 100 characters long." }),
-  dimensions: z
-    .string()
-    .min(1, { message: "Name must be at least 2 characters long." })
-    .max(100, { message: "Name must be no more than 100 characters long." }),
-  weight: z
-    .string()
-    .min(1, { message: "Name must be at least 2 characters long." })
-    .max(100, { message: "Name must be no more than 100 characters long." }),
-  manufacture: z
-    .string()
-    .min(1, { message: "Name must be at least 2 characters long." })
-    .max(100, { message: "Name must be no more than 100 characters long." }),
-  material: z.string(),
-  subcategory: z.string().optional(), // ✅ Add this
+  productImages: z.any().refine(
+    (files) =>
+      Array.isArray(files) &&
+      files.length > 0 &&
+      files.every((file) => file instanceof File),
+    {
+      message: "At least one valid product image is required.",
+    }
+  ),
 
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
 });

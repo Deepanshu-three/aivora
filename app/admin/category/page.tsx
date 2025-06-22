@@ -12,13 +12,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { toast } from "sonner";
 
-// Schema for category and subcategory
 const addCategorySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -29,13 +51,19 @@ const addSubcategorySchema = z.object({
   categoryId: z.string().min(1, "Select a parent category"),
 });
 
+type SubCategory = {
+  id: string;
+  name: string;
+};
+
 type Category = {
   id: string;
   name: string;
   description?: string | null;
+  subCategories: SubCategory[];
 };
 
-export default function AddCategory() {
+export default function CategoryPage() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const categoryForm = useForm<z.infer<typeof addCategorySchema>>({
@@ -71,7 +99,7 @@ export default function AddCategory() {
     const data = categoryForm.getValues();
     try {
       await axios.post("/api/category", data);
-      toast.success("Category created successfully");
+      toast.success("Category created");
       categoryForm.reset();
       fetchCategories();
     } catch {
@@ -83,7 +111,7 @@ export default function AddCategory() {
     const data = subcategoryForm.getValues();
     try {
       await axios.post("/api/subcategory", data);
-      toast.success("Subcategory added successfully");
+      toast.success("Subcategory created");
       subcategoryForm.reset();
       fetchCategories();
     } catch {
@@ -91,13 +119,33 @@ export default function AddCategory() {
     }
   };
 
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      await axios.delete("/api/category", { data: { id } });
+      toast.success("Category deleted");
+      fetchCategories();
+    } catch {
+      toast.error("Error deleting category");
+    }
+  };
+
+  const handleDeleteSubcategory = async (id: string) => {
+    try {
+      await axios.delete("/api/subcategory", { data: { id } });
+      toast.success("Subcategory deleted");
+      fetchCategories();
+    } catch {
+      toast.error("Error deleting subcategory");
+    }
+  };
+
   return (
-    <div className="w-full mx-auto mt-10 max-w-2xl bg-white p-8 md:p-12 border border-[#0C6170] shadow-xl rounded-xl space-y-10 flex flex-col">
-      {/* Category Form */}
+    <div className="w-full mx-auto mt-10 max-w-5xl bg-white p-6 md:p-10 border border-[#0C6170] shadow-xl rounded-xl space-y-12">
+      {/* Add Category Form */}
       <Form {...categoryForm}>
         <form
           onSubmit={categoryForm.handleSubmit(onCategorySubmit)}
-          className="space-y-6 w-full"
+          className="space-y-6"
         >
           <h2 className="text-2xl font-semibold text-center text-[#0C6170]">
             Add New Category
@@ -140,11 +188,11 @@ export default function AddCategory() {
         </form>
       </Form>
 
-      {/* Subcategory Form */}
+      {/* Add Subcategory Form */}
       <Form {...subcategoryForm}>
         <form
           onSubmit={subcategoryForm.handleSubmit(onSubcategorySubmit)}
-          className="space-y-6 w-full"
+          className="space-y-6"
         >
           <h2 className="text-2xl font-semibold text-center text-[#0C6170]">
             Add Subcategory
@@ -171,17 +219,18 @@ export default function AddCategory() {
               <FormItem>
                 <FormLabel>Parent Category</FormLabel>
                 <FormControl>
-                  <select
-                    {...field}
-                    className="w-full p-2 border rounded bg-white"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -194,30 +243,77 @@ export default function AddCategory() {
         </form>
       </Form>
 
-      {/* Existing categories list */}
+      {/* Category Table with Subcategories */}
       <div>
         <h3 className="text-xl font-semibold text-[#0C6170] mb-4">
-          Existing Categories
+          Category List
         </h3>
+
         {categories.length === 0 ? (
           <p className="text-gray-500">No categories found.</p>
         ) : (
-          <ul className="space-y-3 max-h-60 overflow-y-auto border border-gray-300 rounded-md p-4">
-            {categories.map((category) => (
-              <li
-                key={category.id}
-                className="p-3 border border-[#0C6170] rounded-md hover:bg-[#0C6170]/10 cursor-pointer"
-                title={category.description || ""}
-              >
-                <strong>{category.name}</strong>
-                {category.description && (
-                  <p className="text-gray-600 text-sm mt-1">
-                    {category.description}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
+          <div className="border rounded-md overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Category Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Subcategories</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell>{category.description || "-"}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="flex gap-2">
+                            View
+                            <ChevronDown className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          <DropdownMenuLabel>Subcategories</DropdownMenuLabel>
+                          {category.subCategories?.length > 0 ? (
+                            category.subCategories.map((sub) => (
+                              <DropdownMenuItem
+                                key={sub.id}
+                                className="flex justify-between items-center group"
+                              >
+                                <span>{sub.name}</span>
+                                <button
+                                  onClick={() => handleDeleteSubcategory(sub.id)}
+                                  className="text-red-500 text-xs group-hover:underline"
+                                >
+                                  Delete
+                                </button>
+                              </DropdownMenuItem>
+                            ))
+                          ) : (
+                            <DropdownMenuItem disabled>
+                              No subcategories
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteCategory(category.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </div>
     </div>

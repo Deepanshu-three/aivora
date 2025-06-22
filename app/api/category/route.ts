@@ -36,11 +36,33 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const categories = await db.category.findMany();
+    const categories = await db.category.findMany({
+      include: {
+        subCategories: true, // include subcategories
+      },
+    });
     return NextResponse.json(categories, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to fetch categories", error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id } = await req.json();
+
+    await db.category.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Category deleted" });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to delete category", error: (error as Error).message },
       { status: 500 }
     );
   }
