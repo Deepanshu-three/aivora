@@ -89,28 +89,3 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE /api/products/[id]
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const productId = params.id;
-
-  if (!productId) {
-    return NextResponse.json({ message: "Product ID is required" }, { status: 400 });
-  }
-
-  try {
-    const existingProduct = await db.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!existingProduct) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
-    }
-
-    await db.product.delete({ where: { id: productId } });
-
-    return NextResponse.json({ message: "Product deleted successfully" });
-  } catch (error) {
-    console.error("DELETE /api/products/[id] error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-  }
-}

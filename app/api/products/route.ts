@@ -126,3 +126,28 @@ export async function GET() {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const productId = searchParams.get("id");
+
+  if (!productId) {
+    return NextResponse.json({ message: "Product ID is required" }, { status: 400 });
+  }
+
+  try {
+    const existingProduct = await db.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!existingProduct) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
+    await db.product.delete({ where: { id: productId } });
+
+    return NextResponse.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("DELETE /api/products error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
