@@ -47,7 +47,7 @@ model SubCategory {
   createdAt   DateTime   @default(now())
 
   categoryId  String
-  category    Category   @relation(fields: [categoryId], references: [id])
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   products    Product[]  // Products in this subcategory
 }
@@ -70,10 +70,10 @@ model Product {
   createdAt    DateTime    @default(now())
 
   categoryId   String?
-  category     Category?   @relation(fields: [categoryId], references: [id])
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   subCategoryId String?    // NEW
-  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
 
   orderItems    OrderItem[]
   reviews       Review[]
@@ -85,7 +85,7 @@ model Product {
 model ProductImage {
   id        String   @id @default(cuid())
   url       String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id] , onDelete: Cascade)
   productId String
 }
 
@@ -99,7 +99,7 @@ model Order {
   createdAt       DateTime      @default(now())
 
   userId String
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   orderItems OrderItem[]
   payment    Payment?
@@ -124,10 +124,10 @@ model OrderItem {
   price    Float
 
   orderId String
-  order   Order @relation(fields: [orderId], references: [id])
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Payment {
@@ -139,7 +139,7 @@ model Payment {
   paymentDate   DateTime      @default(now())
 
   orderId String   @unique
-  order   Order @relation(fields: [orderId], references: [id])
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 enum PaymentMethod {
@@ -159,7 +159,7 @@ model Review {
   user   User @relation(fields: [userId], references: [id])
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Cart {
@@ -167,7 +167,7 @@ model Cart {
   createdAt DateTime @default(now())
 
   userId String  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   cartItems CartItem[]
 }
@@ -177,10 +177,10 @@ model CartItem {
   quantity Int @default(1)
 
   cartId String
-  cart   Cart @relation(fields: [cartId], references: [id])
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Shipping {
@@ -194,7 +194,7 @@ model Shipping {
   state           String
   // NEW RELATION TO USER
   userId String
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
 
@@ -205,7 +205,7 @@ model Wishlist {
   createdAt DateTime @default(now())
 
   userId String  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   wishlistItems WishlistItem[]
 }
@@ -214,10 +214,10 @@ model WishlistItem {
   id Int @id @default(autoincrement())
 
   wishlistId Int
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 
