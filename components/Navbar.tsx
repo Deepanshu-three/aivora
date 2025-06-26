@@ -10,13 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ChevronDown,
-  LogOut,
-  Menu,
-  X,
-  ListOrderedIcon,
-} from "lucide-react";
+import { ChevronDown, LogOut, Menu, X, ListOrderedIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useUser, useClerk } from "@clerk/nextjs";
 import ShoppingCartCom from "./cart";
@@ -70,12 +64,20 @@ const Navbar = () => {
 
         {/* mobile menu button */}
 
-        <button
-          className="lg:hidden p-2 cursor-pointer"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* cart and menu button on mobile */}
+        <div className="lg:hidden flex items-center gap-2">
+          <ShoppingCartCom />
+          <button
+            className="p-2 cursor-pointer"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
+        </div>
 
         {/* desktop nav */}
         <div className="hidden lg:flex items-center gap-10">
