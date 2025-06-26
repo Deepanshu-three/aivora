@@ -90,9 +90,8 @@ export async function PUT(req: NextRequest) {
 }
 
 // DELETE /api/products/[id]
-export async function DELETE(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const productId = searchParams.get("id");
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const productId = params.id;
 
   if (!productId) {
     return NextResponse.json({ message: "Product ID is required" }, { status: 400 });
@@ -111,7 +110,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {
-    console.error("DELETE /api/products error:", error);
+    console.error("DELETE /api/products/[id] error:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
