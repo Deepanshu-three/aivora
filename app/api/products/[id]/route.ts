@@ -1,5 +1,5 @@
+import db from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 
 function extractIdFromUrl(req: NextRequest) {
   const segments = req.nextUrl.pathname.split("/");
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const res = await prisma.product.findUnique({
+    const res = await db.product.findUnique({
       where: { id: productId },
       include: {
         category: { select: { name: true } },
@@ -62,7 +62,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const updatedProduct = await prisma.product.update({
+    const updatedProduct = await db.product.update({
       where: { id: productId },
       data: {
         name,
@@ -91,10 +91,15 @@ export async function PUT(req: NextRequest) {
 
 // DELETE /api/products/[id]
 export async function DELETE(req: NextRequest) {
-  const productId = extractIdFromUrl(req);
+  const searchParams = req.nextUrl.searchParams;
+  const productId = searchParams.get("id");
+
+  if (!productId) {
+    return NextResponse.json({ message: "Product ID is required" }, { status: 400 });
+  }
 
   try {
-    const existingProduct = await prisma.product.findUnique({
+    const existingProduct = await db.product.findUnique({
       where: { id: productId },
     });
 
@@ -102,11 +107,11 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    await prisma.product.delete({ where: { id: productId } });
+    await db.product.delete({ where: { id: productId } });
 
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {
-    console.error("DELETE /api/products/[id] error:", error);
+    console.error("DELETE /api/products error:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
