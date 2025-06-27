@@ -95,7 +95,7 @@ const ProductCard = (product: Product) => {
             </span>
           </div>
           <span className="text-right text-2xl text-primary font-extrabold">
-            Rs.{product.price}
+          ₹{product.price}
           </span>
         </div>
       </div>

@@ -39,7 +39,7 @@ const BestSeller = () => {
             name: product.name,
             image: product.images[0]?.url || "",
             rating: 4 + Math.random(), // demo rating
-            price: `₹${product.price}`,
+            price: `${product.price}`,
             description: product.description || "",
             category: product.category?.name || "",
             material: product.material || "N/A",

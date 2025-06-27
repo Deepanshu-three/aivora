@@ -154,13 +154,14 @@ export default function ProductsList({ filters }: ProductFilterProps) {
                 id={product.id}
                 key={product.id}
                 name={product.name}
-                description={product.title ?? ""}
+                description={product.description ?? ""}
                 image={product.images?.[0]?.url ?? ""}
                 price={product.price.toString()}
                 category={product.category?.name ?? ""}
                 material={product.material ?? ""}
                 rating={4}
               />
+              
             ))
           ) : (
             <p className="text-center col-span-full text-gray-500">
