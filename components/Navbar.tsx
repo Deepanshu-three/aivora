@@ -58,7 +58,7 @@ const Navbar = () => {
       <div className="w-full container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 md:h-20 h-16">
         {/* logo */}
         <Link href="/" className="flex justify-center items-center space-x-2">
-          <img src="/logo.png" alt="logo" className="h-8 w-8 " />
+          <img src="/logo.png" alt="logo" className="h-14 w-14 rounded-2xl " />
           <span className="text-2xl font-extrabold">Aivora</span>
         </Link>
 
